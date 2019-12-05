@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">Weather forecast</string>
+    <string name="app_name" translatable="false">Weather forecast</string>
+    <string name="text">Given key behaviour scenarios, the further development of different forms of activity is crucial to strengthening moral values.</string>
+    <string name="Monday">Monday</string>
+    <string name="Tuesday">Tuesday</string>
+    <string name="Wednesday">Wednesday</string>
+    <string name="Thursday">Thursday</string>
+    <string name="Friday">Friday</string>
+    <string name="Saturday">Saturday</string>
+    <string name="Sunday">Sunday</string>
 </resources>
