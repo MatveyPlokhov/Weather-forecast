@@ -2,9 +2,9 @@
     <string name="forecastText">описание погоды описание погоды описание погоды описание погоды</string>
     <string name="humidity">Влажность</string>
     <string name="cloudiness">Облачность</string>
-    <string name="search">Поиск</string>
-    <string name="cities">Москва,Санкт-Петербург,Новосибирск,Екатеринбург,Нижний_Новгород,Казань,Ростов-на-Дону,Сочи</string>
+    <string name="cities">Москва,Санкт-Петербург,Новосибирск,Екатеринбург,Нижний Новгород,Казань,Ростов-на-Дону,Сочи</string>
     <string name="today">Сегодня</string>
     <string name="tomorrow">Завтра</string>
     <string name="day">День</string>
+    <string name="night">Ночь</string>
 </resources>

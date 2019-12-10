@@ -23,11 +23,11 @@ public class Cities extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.cities);
-        initialization();
+        initView();
         addCitiesButtons();
     }
 
-    private void initialization() {
+    private void initView() {
         cities = new LinkedList<>(Arrays.asList(getResources().getString(R.string.cities).split(",")));
         verticalLinearLayoutCities = findViewById(R.id.verticalLinearLayoutCities);
     }
@@ -46,6 +46,7 @@ public class Cities extends AppCompatActivity {
                     Intent intent = new Intent();
                     intent.putExtra(Cities.CITY_KEY, button.getText());
                     setResult(RESULT_OK, intent);
+                    Main.allVisible();
                     finish();
                 }
             });

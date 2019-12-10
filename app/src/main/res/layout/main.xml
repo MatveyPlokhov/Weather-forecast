@@ -8,7 +8,7 @@
     tools:context=".Main">
 
     <LinearLayout
-        android:id="@+id/scrollViewStorage"
+        android:id="@+id/linearLayoutStorage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -21,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:overScrollMode="never"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:visibility="visible">
 
             <LinearLayout
                 android:id="@+id/horizontalLinearLayoutCities"
@@ -47,7 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:overScrollMode="never"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:visibility="gone">
 
             <LinearLayout
                 android:id="@+id/horizontalLinearLayoutSettings"
@@ -74,35 +76,17 @@
             </LinearLayout>
         </HorizontalScrollView>
 
-        <TextView
-            android:id="@+id/cloudiness"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/cloudiness"
-            android:textSize="36sp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/humidity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/humidity"
-            android:textSize="36sp"
-            android:visibility="gone" />
     </LinearLayout>
 
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/textViewUrl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scrollViewStorage">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutStorage">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -122,112 +106,143 @@
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp">
 
-                    <TextView
-                        android:id="@+id/temperatureDay1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day1"
-                        app:layout_constraintEnd_toEndOf="@+id/day1"
-                        tools:text="0/0" />
-
-                    <ImageView
-                        android:id="@+id/day1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
+                    <FrameLayout
+                        android:id="@+id/frameLayout1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:srcCompat="@drawable/cloud" />
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/temperatureDay2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day2"
-                        app:layout_constraintEnd_toEndOf="@+id/day2"
-                        tools:text="0/0" />
+                        <ImageView
+                            android:id="@+id/day1"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                    <ImageView
-                        android:id="@+id/day2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:layout_constraintStart_toEndOf="@id/day1"
-                        app:layout_constraintTop_toTopOf="@id/day1"
-                        app:srcCompat="@drawable/lightcloud" />
+                        <TextView
+                            android:id="@+id/temperature1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/temperatureDay3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day3"
-                        app:layout_constraintEnd_toEndOf="@+id/day3"
-                        tools:text="0/0" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout1"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout1">
 
-                    <ImageView
-                        android:id="@+id/day3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:layout_constraintStart_toEndOf="@id/day2"
-                        app:layout_constraintTop_toTopOf="@id/day2"
-                        app:srcCompat="@drawable/lightrainsun_night" />
+                        <ImageView
+                            android:id="@+id/day2"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/temperatureDay4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day4"
-                        app:layout_constraintEnd_toEndOf="@+id/day4"
-                        tools:text="0/0" />
+                        <TextView
+                            android:id="@+id/temperature2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
 
-                    <ImageView
-                        android:id="@+id/day4"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:layout_constraintStart_toEndOf="@id/day3"
-                        app:layout_constraintTop_toTopOf="@id/day3"
-                        app:srcCompat="@drawable/sun" />
+                    </FrameLayout>
 
-                    <TextView
-                        android:id="@+id/temperatureDay5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day5"
-                        app:layout_constraintEnd_toEndOf="@+id/day5"
-                        tools:text="0/0" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout2"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout2">
 
-                    <ImageView
-                        android:id="@+id/day5"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:layout_constraintStart_toEndOf="@id/day4"
-                        app:layout_constraintTop_toTopOf="@id/day4"
-                        app:srcCompat="@drawable/partlycloud" />
+                        <ImageView
+                            android:id="@+id/day3"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:id="@+id/temperature3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/frameLayout4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout3"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout3">
+
+                        <ImageView
+                            android:id="@+id/day4"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:id="@+id/temperature4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
+
+                    </FrameLayout>
+
+                    <FrameLayout
+                        android:id="@+id/frameLayout5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout4"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout4">
+
+                        <ImageView
+                            android:id="@+id/day5"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:id="@+id/temperature5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
+
+                    </FrameLayout>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </HorizontalScrollView>
@@ -254,7 +269,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/sun"
+                    app:srcCompat="@drawable/nodata"
                     tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -279,7 +294,8 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/todayDay">
+                        app:layout_constraintTop_toBottomOf="@+id/todayDay"
+                        tools:ignore="NestedScrolling">
 
                         <TextView
                             android:id="@+id/todayDayForecast"
@@ -310,7 +326,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/fog"
+                    app:srcCompat="@drawable/nodata"
                     tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -324,7 +340,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto"
                         android:gravity="center_horizontal"
-                        android:text="@string/day"
+                        android:text="@string/night"
                         android:textColor="@android:color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -335,7 +351,8 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/todayNight">
+                        app:layout_constraintTop_toBottomOf="@+id/todayNight"
+                        tools:ignore="NestedScrolling">
 
                         <TextView
                             android:id="@+id/todayNightForecast"
@@ -385,7 +402,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/sun"
+                    app:srcCompat="@drawable/nodata"
                     tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -410,7 +427,8 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tomorrowDay">
+                        app:layout_constraintTop_toBottomOf="@+id/tomorrowDay"
+                        tools:ignore="NestedScrolling">
 
                         <TextView
                             android:id="@+id/tomorrowDayForecast"
@@ -441,7 +459,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:srcCompat="@drawable/fog"
+                    app:srcCompat="@drawable/nodata"
                     tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -455,7 +473,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto"
                         android:gravity="center_horizontal"
-                        android:text="@string/day"
+                        android:text="@string/night"
                         android:textColor="@android:color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -466,7 +484,8 @@
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tomorrowNight">
+                        app:layout_constraintTop_toBottomOf="@+id/tomorrowNight"
+                        tools:ignore="NestedScrolling">
 
                         <TextView
                             android:id="@+id/tomorrowNightForecast"
@@ -500,10 +519,14 @@
 
     <TextView
         android:id="@+id/textViewUrl"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:background="@color/colorPrimary"
+        android:fontFamily="@font/roboto"
         android:gravity="center_horizontal"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

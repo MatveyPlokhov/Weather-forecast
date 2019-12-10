@@ -3,9 +3,9 @@
     <string name="forecastText">description the weather description the weather description the weather description the weather</string>
     <string name="humidity">Humidity</string>
     <string name="cloudiness">Cloudiness</string>
-    <string name="search">Search</string>
-    <string name="cities">Moscow,Saint Petersburg,Novosibirsk,Yekaterinburg,Nizhny_Novgorod,Kazan,Rostov-on-Don,Sochi</string>
+    <string name="cities">Moscow,Saint Petersburg,Novosibirsk,Yekaterinburg,Nizhny Novgorod,Kazan,Rostov-on-Don,Sochi</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="day">Day</string>
+    <string name="night">Night</string>
 </resources>
