@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".Main">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/linearLayoutStorage"
@@ -78,6 +78,16 @@
 
     </LinearLayout>
 
+    <fragment
+        android:id="@+id/fragmentCities"
+        android:name="com.mapl.weather_forecast.CitiesFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout="@layout/cities_fragment"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutStorage"/>
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
@@ -86,149 +96,166 @@
         app:layout_constraintBottom_toTopOf="@+id/textViewUrl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayoutStorage">
+        app:layout_constraintTop_toBottomOf="@+id/fragmentCities">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <HorizontalScrollView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
+                android:layout_marginTop="8dp"
+                android:overScrollMode="never"
+                android:scrollbars="none">
 
-                <FrameLayout
-                    android:id="@+id/frameLayout1"
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp">
 
-                    <ImageView
-                        android:id="@+id/day1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
 
-                    <TextView
-                        android:id="@+id/temperature1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
-                </FrameLayout>
+                        <ImageView
+                            android:id="@+id/day1"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                <FrameLayout
-                    android:id="@+id/frameLayout2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                        <TextView
+                            android:id="@+id/temperature1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
+                    </FrameLayout>
 
-                    <ImageView
-                        android:id="@+id/day2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout1"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout1">
 
-                    <TextView
-                        android:id="@+id/temperature2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                        <ImageView
+                            android:id="@+id/day2"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                </FrameLayout>
+                        <TextView
+                            android:id="@+id/temperature2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
 
-                <FrameLayout
-                    android:id="@+id/frameLayout3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    </FrameLayout>
 
-                    <ImageView
-                        android:id="@+id/day3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout2"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout2">
 
-                    <TextView
-                        android:id="@+id/temperature3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                        <ImageView
+                            android:id="@+id/day3"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                </FrameLayout>
+                        <TextView
+                            android:id="@+id/temperature3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
 
-                <FrameLayout
-                    android:id="@+id/frameLayout4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    </FrameLayout>
 
-                    <ImageView
-                        android:id="@+id/day4"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout3"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout3">
 
-                    <TextView
-                        android:id="@+id/temperature4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                        <ImageView
+                            android:id="@+id/day4"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                </FrameLayout>
+                        <TextView
+                            android:id="@+id/temperature4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
 
-                <FrameLayout
-                    android:id="@+id/frameLayout5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    </FrameLayout>
 
-                    <ImageView
-                        android:id="@+id/day5"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                    <FrameLayout
+                        android:id="@+id/frameLayout5"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        app:layout_constraintStart_toEndOf="@+id/frameLayout4"
+                        app:layout_constraintTop_toTopOf="@+id/frameLayout4">
 
-                    <TextView
-                        android:id="@+id/temperature5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                        <ImageView
+                            android:id="@+id/day5"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:layout_marginStart="8dp"
+                            app:srcCompat="@drawable/nodata"
+                            tools:ignore="ContentDescription" />
 
-                </FrameLayout>
-            </LinearLayout>
+                        <TextView
+                            android:id="@+id/temperature5"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@android:color/white"
+                            android:fontFamily="@font/roboto"
+                            android:textColor="@android:color/black"
+                            android:textSize="18sp"
+                            tools:text="0/0" />
+
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </HorizontalScrollView>
 
             <TextView
                 android:id="@+id/today"
