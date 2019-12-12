@@ -1,8 +1,8 @@
 package com.mapl.weather_forecast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -23,12 +23,13 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Random;
 
-public class Main extends AppCompatActivity {
+import static com.mapl.weather_forecast.R.id.fragmentCities;
+
+public class MainActivity extends AppCompatActivity implements Postman {
     Random random = new Random();
     static LinearLayout horizontalLinearLayoutCities;
     static HorizontalScrollView horizontalScrollViewSettings;
     static ScrollView scrollView;
-    private final int RESULT_KEY = 12;
 
     Button addNewCity;
     ImageView day1, day2, day3, day4, day5,
@@ -41,11 +42,15 @@ public class Main extends AppCompatActivity {
     HashMap<String, String> fiveDays;
     LinkedList<String> cityList;
 
+    CitiesFragment citiesFragment;
+    FragmentManager fragmentManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.main_layout);
         initView();
+        initFragment();
         clickListeners();
         checkedChangeListener();
     }
@@ -86,17 +91,80 @@ public class Main extends AppCompatActivity {
         cityList = new LinkedList<>();
     }
 
+    private void initFragment() {
+        fragmentManager = getSupportFragmentManager();
+
+        citiesFragment = (CitiesFragment) fragmentManager.findFragmentById(fragmentCities);
+        fragmentManager.beginTransaction()
+                .hide(citiesFragment)
+                .commit();
+    }
+
     private void initVariableForCity(String city) {
         if (!fiveDays.containsKey(city)) {
             String data = "";
             for (int i = 1; i <= 5; i++) {
                 data += (-10 + random.nextInt(20)) + ","
-                        + (-10 + random.nextInt(20)) + ",";
-                data += randomImage(1 + random.nextInt(15)) + ","
-                        + randomImage(1 + random.nextInt(15)) + ",";
+                        + (-10 + random.nextInt(20)) + ","
+                        + randomImage(random.nextInt(15)) + ","
+                        + randomImage(random.nextInt(15)) + ",";
             }
             fiveDays.put(city, data);
         }
+    }
+
+    private int randomImage(int r) {
+        int id;
+        switch (r) {
+            case 0:
+                id = R.drawable.cloud;
+                break;
+            case 1:
+                id = R.drawable.fog;
+                break;
+            case 2:
+                id = R.drawable.lightcloud;
+                break;
+            case 3:
+                id = R.drawable.lightcloud_night;
+                break;
+            case 4:
+                id = R.drawable.lightrain;
+                break;
+            case 5:
+                id = R.drawable.lightrainsun;
+                break;
+            case 6:
+                id = R.drawable.lightrainthunder;
+                break;
+            case 7:
+                id = R.drawable.partlycloud;
+                break;
+            case 8:
+                id = R.drawable.partlycloud_night;
+                break;
+            case 9:
+                id = R.drawable.rain;
+                break;
+            case 10:
+                id = R.drawable.rainthunder;
+                break;
+            case 11:
+                id = R.drawable.sleet;
+                break;
+            case 12:
+                id = R.drawable.snow;
+                break;
+            case 13:
+                id = R.drawable.sun;
+                break;
+            case 14:
+                id = R.drawable.sun_night;
+                break;
+            default:
+                id = R.drawable.nodata;
+        }
+        return id;
     }
 
     private void writeVariableForCity(String city) {
@@ -125,89 +193,39 @@ public class Main extends AppCompatActivity {
         pasteURL(textViewUrl, city);
     }
 
-    private int randomImage(int r) {
-        int id;
-        switch (r) {
-            case 1:
-                id = R.drawable.cloud;
-                break;
-            case 2:
-                id = R.drawable.fog;
-                break;
-            case 3:
-                id = R.drawable.lightcloud;
-                break;
-            case 4:
-                id = R.drawable.lightcloud_night;
-                break;
-            case 5:
-                id = R.drawable.lightrain;
-                break;
-            case 6:
-                id = R.drawable.lightrainsun;
-                break;
-            case 7:
-                id = R.drawable.lightrainthunder;
-                break;
-            case 8:
-                id = R.drawable.partlycloud;
-                break;
-            case 9:
-                id = R.drawable.partlycloud_night;
-                break;
-            case 10:
-                id = R.drawable.rain;
-                break;
-            case 11:
-                id = R.drawable.rainthunder;
-                break;
-            case 12:
-                id = R.drawable.sleet;
-                break;
-            case 13:
-                id = R.drawable.snow;
-                break;
-            case 14:
-                id = R.drawable.sun;
-                break;
-            case 15:
-                id = R.drawable.sun_night;
-                break;
-            default:
-                id = R.drawable.nodata;
-        }
-        return id;
-    }
-
     private void clickListeners() {
         addNewCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Main.this, Cities.class);
-                startActivityForResult(intent, RESULT_KEY);
+                fragmentManager.beginTransaction()
+                        .show(citiesFragment)
+                        .commit();
             }
         });
         textViewUrl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri uri = Uri.parse(textViewUrl.getText().toString());
-                Intent intent = new Intent(Intent.ACTION_VIEW,uri);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
             }
         });
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        selectCity = Objects.requireNonNull(data).getStringExtra(Cities.CITY_KEY);
-        if (requestCode == RESULT_KEY && resultCode == RESULT_OK && !cityList.contains(selectCity)) {
+    public void fragmentMail(String cityName) {
+        selectCity = cityName;
+        fragmentManager.beginTransaction()
+                .hide(citiesFragment)
+                .commit();
+        if (!cityList.contains(cityName)) {
             addButtonInLayout(horizontalLinearLayoutCities, LinearLayout.LayoutParams.WRAP_CONTENT,
                     (int) getResources().getDimension(R.dimen.buttonSize), selectCity);
             cityList.addFirst(selectCity);
             initVariableForCity(selectCity);
-            writeVariableForCity(selectCity);
+            allVisible();
         }
+        writeVariableForCity(selectCity);
     }
 
     private void pasteURL(TextView textView, String city) {
