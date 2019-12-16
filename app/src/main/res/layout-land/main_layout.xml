@@ -90,7 +90,7 @@
 
         <fragment
             android:id="@+id/fragmentCities"
-            android:name="com.mapl.weather_forecast.CitiesFragment"
+            android:name="com.mapl.weather_forecast.SearchCityCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

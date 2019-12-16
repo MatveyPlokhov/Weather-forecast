@@ -27,9 +27,9 @@ import static com.mapl.weather_forecast.R.id.fragmentCities;
 
 public class MainActivity extends AppCompatActivity implements Postman {
     Random random = new Random();
-    static LinearLayout horizontalLinearLayoutCities;
-    static HorizontalScrollView horizontalScrollViewSettings;
-    static ScrollView scrollView;
+    LinearLayout horizontalLinearLayoutCities;
+    HorizontalScrollView horizontalScrollViewSettings;
+    ScrollView scrollView;
 
     Button addNewCity;
     ImageView day1, day2, day3, day4, day5,
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements Postman {
     HashMap<String, String> fiveDays;
     LinkedList<String> cityList;
 
-    CitiesFragment citiesFragment;
+    SearchCityCard searchCityCard;
     FragmentManager fragmentManager;
 
     @Override
@@ -94,22 +94,22 @@ public class MainActivity extends AppCompatActivity implements Postman {
     private void initFragment() {
         fragmentManager = getSupportFragmentManager();
 
-        citiesFragment = (CitiesFragment) fragmentManager.findFragmentById(fragmentCities);
+        searchCityCard = (SearchCityCard) fragmentManager.findFragmentById(fragmentCities);
         fragmentManager.beginTransaction()
-                .hide(citiesFragment)
+                .hide(searchCityCard)
                 .commit();
     }
 
     private void initVariableForCity(String city) {
         if (!fiveDays.containsKey(city)) {
-            String data = "";
+            StringBuilder data = new StringBuilder();
             for (int i = 1; i <= 5; i++) {
-                data += (-10 + random.nextInt(20)) + ","
-                        + (-10 + random.nextInt(20)) + ","
-                        + randomImage(random.nextInt(15)) + ","
-                        + randomImage(random.nextInt(15)) + ",";
+                data.append(-10 + random.nextInt(20)).append(",")
+                        .append(-10 + random.nextInt(20)).append(",")
+                        .append(randomImage(random.nextInt(15))).append(",")
+                        .append(randomImage(random.nextInt(15))).append(",");
             }
-            fiveDays.put(city, data);
+            fiveDays.put(city, data.toString());
         }
     }
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements Postman {
             @Override
             public void onClick(View v) {
                 fragmentManager.beginTransaction()
-                        .show(citiesFragment)
+                        .show(searchCityCard)
                         .commit();
             }
         });
@@ -213,13 +213,13 @@ public class MainActivity extends AppCompatActivity implements Postman {
     }
 
     @Override
-    public void fragmentMail(String cityName) {
+    public void getCityName(String cityName) {
         selectCity = cityName;
         fragmentManager.beginTransaction()
-                .hide(citiesFragment)
+                .hide(searchCityCard)
                 .commit();
         if (!cityList.contains(cityName)) {
-            addButtonInLayout(horizontalLinearLayoutCities, LinearLayout.LayoutParams.WRAP_CONTENT,
+            addButtonInLayout(horizontalLinearLayoutCities,
                     (int) getResources().getDimension(R.dimen.buttonSize), selectCity);
             cityList.addFirst(selectCity);
             initVariableForCity(selectCity);
@@ -229,13 +229,13 @@ public class MainActivity extends AppCompatActivity implements Postman {
     }
 
     private void pasteURL(TextView textView, String city) {
-        url = ("https://ru.wikipedia.org/wiki/" + city).replaceAll(" ", "_");
+        url = ("https://wikipedia.org/wiki/" + city).replaceAll(" ", "_");
         textView.setText(url);
     }
 
-    private void addButtonInLayout(LinearLayout linearLayout, int width, int height, String city) {
+    private void addButtonInLayout(LinearLayout linearLayout, int height, String city) {
         final Button button = new Button(getApplicationContext());
-        button.setLayoutParams(new ViewGroup.LayoutParams(width, height));
+        button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
         button.setText(city);
         linearLayout.addView(button, 0);
 
@@ -252,30 +252,36 @@ public class MainActivity extends AppCompatActivity implements Postman {
         checkBoxHumidity.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    checkBoxHumidity.setText(getString(R.string.humidity) + ": " + random.nextInt(101));
-                else
-                    checkBoxHumidity.setText(getString(R.string.humidity));
+                String humidityText = getString(R.string.humidity);
+                String randomHumidity = String.valueOf(random.nextInt(101));
+                if (isChecked) {
+                    String text = humidityText + ": " + randomHumidity;
+                    checkBoxHumidity.setText(text);
+                } else
+                    checkBoxHumidity.setText(humidityText);
             }
         });
         checkBoxCloudiness.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    checkBoxCloudiness.setText(getString(R.string.cloudiness) + ": " + random.nextInt(101));
-                else
-                    checkBoxCloudiness.setText(getString(R.string.cloudiness));
+                String cloudinessText = getString(R.string.cloudiness);
+                String randomCloudiness = String.valueOf(random.nextInt(101));
+                if (isChecked) {
+                    String text = cloudinessText + ": " + randomCloudiness;
+                    checkBoxCloudiness.setText(text);
+                } else
+                    checkBoxCloudiness.setText(cloudinessText);
             }
         });
     }
 
-    static void allVisible() {
+    private void allVisible() {
         horizontalScrollViewSettings.setVisibility(View.VISIBLE);
         scrollView.setVisibility(View.VISIBLE);
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("fiveDays", fiveDays);
         outState.putSerializable("cityList", cityList);
@@ -289,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements Postman {
         cityList = (LinkedList<String>) savedInstanceState.getSerializable("cityList");
         selectCity = savedInstanceState.getString("selectCity");
         for (int i = cityList.size() - 1; i >= 0; i--) {
-            addButtonInLayout(horizontalLinearLayoutCities, LinearLayout.LayoutParams.WRAP_CONTENT,
+            addButtonInLayout(horizontalLinearLayoutCities,
                     (int) getResources().getDimension(R.dimen.buttonSize), cityList.get(i));
         }
         writeVariableForCity(selectCity);
