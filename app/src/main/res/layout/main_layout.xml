@@ -80,13 +80,13 @@
 
     <fragment
         android:id="@+id/fragmentCities"
-        android:name="com.mapl.weather_forecast.CitiesFragment"
+        android:name="com.mapl.weather_forecast.SearchCityCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout="@layout/cities_fragment"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayoutStorage"/>
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutStorage"
+        tools:layout="@layout/cities_fragment" />
 
     <ScrollView
         android:id="@+id/scrollView"
