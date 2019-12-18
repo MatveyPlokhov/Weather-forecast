@@ -4,15 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -23,43 +18,35 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Random;
 
-import static com.mapl.weather_forecast.R.id.fragmentCities;
+import static com.mapl.weather_forecast.R.id.recyclerViewSelectedListOfCities;
 
 public class MainActivity extends AppCompatActivity implements Postman {
     Random random = new Random();
-    LinearLayout horizontalLinearLayoutCities;
-    HorizontalScrollView horizontalScrollViewSettings;
     ScrollView scrollView;
 
-    Button addNewCity;
     ImageView day1, day2, day3, day4, day5,
             todayDayImage, todayNightImage, tomorrowDayImage, tomorrowNightImage;
     TextView temperature1, temperature2, temperature3, temperature4, temperature5,
             todayDayTemperature, todayNightTemperature, tomorrowDayTemperature, tomorrowNightTemperature;
-    TextView textViewUrl;
-    CheckBox checkBoxHumidity, checkBoxCloudiness;
-    String url, selectCity;
+
+    String selectCity;
     HashMap<String, String> fiveDays;
+
     LinkedList<String> cityList;
 
-    SearchCityCard searchCityCard;
+    CityListInHomePage cityListInHomePage;
     FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
+        setContentView(R.layout.activity_main);
         initView();
-        initFragment();
-        clickListeners();
-        checkedChangeListener();
+        initFragments();
+        //clickListeners();
     }
 
     private void initView() {
-        addNewCity = findViewById(R.id.addNewCity);
-
-        horizontalLinearLayoutCities = findViewById(R.id.horizontalLinearLayoutCities);
-        horizontalScrollViewSettings = findViewById(R.id.horizontalScrollViewSettings);
         scrollView = findViewById(R.id.scrollView);
 
         day1 = findViewById(R.id.day1);
@@ -82,22 +69,19 @@ public class MainActivity extends AppCompatActivity implements Postman {
         tomorrowDayTemperature = findViewById(R.id.tomorrowDayTemperature);
         tomorrowNightTemperature = findViewById(R.id.tomorrowNightTemperature);
 
-        checkBoxCloudiness = findViewById(R.id.checkBoxCloudiness);
-        checkBoxHumidity = findViewById(R.id.checkBoxHumidity);
-
-        textViewUrl = findViewById(R.id.textViewUrl);
-
         fiveDays = new HashMap<>();
         cityList = new LinkedList<>();
     }
 
-    private void initFragment() {
+    private void initFragments() {
         fragmentManager = getSupportFragmentManager();
 
-        searchCityCard = (SearchCityCard) fragmentManager.findFragmentById(fragmentCities);
-        fragmentManager.beginTransaction()
-                .hide(searchCityCard)
-                .commit();
+        cityListInHomePage = (CityListInHomePage) fragmentManager.findFragmentById(recyclerViewSelectedListOfCities);
+        //cityListInSearchPage = (CityListInSearchPage) fragmentManager.findFragmentById(fragmentCities);
+
+        /*fragmentManager.beginTransaction()
+                .hide(cityListInSearchPage)
+                .commit();*/
     }
 
     private void initVariableForCity(String city) {
@@ -189,35 +173,20 @@ public class MainActivity extends AppCompatActivity implements Postman {
         day3.setImageResource(Integer.parseInt(parseDate[10]));
         day4.setImageResource(Integer.parseInt(parseDate[14]));
         day5.setImageResource(Integer.parseInt(parseDate[18]));
-
-        pasteURL(textViewUrl, city);
     }
 
     private void clickListeners() {
-        addNewCity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentManager.beginTransaction()
-                        .show(searchCityCard)
-                        .commit();
-            }
-        });
-        textViewUrl.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Uri uri = Uri.parse(textViewUrl.getText().toString());
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                startActivity(intent);
-            }
-        });
+
     }
 
     @Override
     public void getCityName(String cityName) {
-        selectCity = cityName;
+        /*selectCity = cityName;
+
         fragmentManager.beginTransaction()
-                .hide(searchCityCard)
+                .hide(cityListInSearchPage)
                 .commit();
+
         if (!cityList.contains(cityName)) {
             addButtonInLayout(horizontalLinearLayoutCities,
                     (int) getResources().getDimension(R.dimen.buttonSize), selectCity);
@@ -225,12 +194,7 @@ public class MainActivity extends AppCompatActivity implements Postman {
             initVariableForCity(selectCity);
             allVisible();
         }
-        writeVariableForCity(selectCity);
-    }
-
-    private void pasteURL(TextView textView, String city) {
-        url = ("https://wikipedia.org/wiki/" + city).replaceAll(" ", "_");
-        textView.setText(url);
+        writeVariableForCity(selectCity);*/
     }
 
     private void addButtonInLayout(LinearLayout linearLayout, int height, String city) {
@@ -248,35 +212,7 @@ public class MainActivity extends AppCompatActivity implements Postman {
         });
     }
 
-    private void checkedChangeListener() {
-        checkBoxHumidity.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String humidityText = getString(R.string.humidity);
-                String randomHumidity = String.valueOf(random.nextInt(101));
-                if (isChecked) {
-                    String text = humidityText + ": " + randomHumidity;
-                    checkBoxHumidity.setText(text);
-                } else
-                    checkBoxHumidity.setText(humidityText);
-            }
-        });
-        checkBoxCloudiness.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                String cloudinessText = getString(R.string.cloudiness);
-                String randomCloudiness = String.valueOf(random.nextInt(101));
-                if (isChecked) {
-                    String text = cloudinessText + ": " + randomCloudiness;
-                    checkBoxCloudiness.setText(text);
-                } else
-                    checkBoxCloudiness.setText(cloudinessText);
-            }
-        });
-    }
-
     private void allVisible() {
-        horizontalScrollViewSettings.setVisibility(View.VISIBLE);
         scrollView.setVisibility(View.VISIBLE);
     }
 
@@ -294,10 +230,10 @@ public class MainActivity extends AppCompatActivity implements Postman {
         fiveDays = (HashMap<String, String>) savedInstanceState.getSerializable("fiveDays");
         cityList = (LinkedList<String>) savedInstanceState.getSerializable("cityList");
         selectCity = savedInstanceState.getString("selectCity");
-        for (int i = cityList.size() - 1; i >= 0; i--) {
+        /*for (int i = cityList.size() - 1; i >= 0; i--) {
             addButtonInLayout(horizontalLinearLayoutCities,
                     (int) getResources().getDimension(R.dimen.buttonSize), cityList.get(i));
-        }
+        }*/
         writeVariableForCity(selectCity);
         allVisible();
     }

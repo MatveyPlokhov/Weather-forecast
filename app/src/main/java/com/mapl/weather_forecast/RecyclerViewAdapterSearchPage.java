@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private ArrayList<CityDataClass> arrayList;
+public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<RecyclerViewAdapterSearchPage.ViewHolder> {
+    private ArrayList<CityDataClassSearchPage> arrayList;
     private Activity activity;
     private Context context;
 
-    RecyclerViewAdapter(ArrayList<CityDataClass> arrayList, Activity activity) {
+    RecyclerViewAdapterSearchPage(ArrayList<CityDataClassSearchPage> arrayList, Activity activity) {
         if (arrayList != null)
             this.arrayList = arrayList;
         else
@@ -29,7 +29,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.city_card, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.card_city_in_search_page, parent, false);
         return new ViewHolder(view);
     }
 
@@ -54,7 +54,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            cityName = itemView.findViewById(R.id.cityName);
+            cityName = itemView.findViewById(R.id.cityNameSP);
         }
     }
 }

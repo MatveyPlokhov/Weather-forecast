@@ -7,7 +7,7 @@
     android:background="@android:color/white"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <!--<LinearLayout
         android:id="@+id/linearLayoutStorage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,58 +42,33 @@
 
             </LinearLayout>
         </HorizontalScrollView>
-
-        <HorizontalScrollView
-            android:id="@+id/horizontalScrollViewSettings"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never"
-            android:scrollbars="none"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:id="@+id/horizontalLinearLayoutSettings"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <CheckBox
-                    android:id="@+id/checkBoxHumidity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto"
-                    android:text="@string/humidity"
-                    android:textColor="@android:color/black" />
-
-                <CheckBox
-                    android:id="@+id/checkBoxCloudiness"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto"
-                    android:text="@string/cloudiness"
-                    android:textColor="@android:color/black" />
-
-            </LinearLayout>
-        </HorizontalScrollView>
-
-    </LinearLayout>
+    </LinearLayout>-->
 
     <fragment
-        android:id="@+id/fragmentCities"
-        android:name="com.mapl.weather_forecast.SearchCityCard"
+        android:id="@+id/fragmentSelectedListOfCities"
+        android:name="com.mapl.weather_forecast.CityListInHomePage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayoutStorage"
-        tools:layout="@layout/cities_fragment" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout="@layout/activity_city" />
 
-    <ScrollView
+    <fragment
+        android:id="@+id/fragmentWeatherForecast"
+        android:name="com.mapl.weather_forecast.WeatherForecastFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragmentSelectedListOfCities"
+        tools:layout="@layout/fragment_weather_forecast" />
+
+    <!--<ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/textViewUrl"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fragmentCities">
@@ -525,22 +500,6 @@
 
 
         </LinearLayout>
-    </ScrollView>
-
-    <TextView
-        android:id="@+id/textViewUrl"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:fontFamily="@font/roboto"
-        android:gravity="center_horizontal"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="HardcodedText"
-        tools:text="find more about this city" />
+    </ScrollView>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
