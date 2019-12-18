@@ -4,8 +4,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cityCardSP"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    style="@style/layoutMW"
     android:layout_marginStart="16dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="16dp"
@@ -14,12 +13,9 @@
 
     <TextView
         android:id="@+id/cityNameSP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/layoutWW88"
         android:fontFamily="@font/roboto"
-        android:paddingStart="8dp"
         android:paddingTop="8dp"
-        android:paddingEnd="8dp"
         android:paddingBottom="8dp"
         android:textColor="@android:color/black"
         android:textSize="24sp"

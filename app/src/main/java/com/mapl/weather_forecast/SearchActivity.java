@@ -7,10 +7,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 
-public class CityListInSearchPage extends AppCompatActivity implements Postman {
+public class SearchActivity extends AppCompatActivity implements Postman {
     private RecyclerViewAdapterSearchPage recyclerViewAdapter;
     private RecyclerView recyclerView;
     private String[] cities;
@@ -32,23 +37,48 @@ public class CityListInSearchPage extends AppCompatActivity implements Postman {
     }
 
     private void addCards() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(CityListInSearchPage.this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(SearchActivity.this);
         cities = getResources().getStringArray(R.array.citiesArray);
         ArrayList<CityDataClassSearchPage> arrayList = new ArrayList<>();
 
         for (String city : cities)
             arrayList.add(new CityDataClassSearchPage(city));
 
-        recyclerViewAdapter = new RecyclerViewAdapterSearchPage(arrayList, CityListInSearchPage.this);
+        recyclerViewAdapter = new RecyclerViewAdapterSearchPage(arrayList, SearchActivity.this);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(recyclerViewAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                recyclerViewAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        return true;
     }
 
     @Override
     public void getCityName(String cityName) {
         this.cityName = cityName;
         Intent intent = new Intent();
-        intent.putExtra(CityListInSearchPage.CITY_KEY, cityName);
+        intent.putExtra(SearchActivity.CITY_KEY, cityName);
         setResult(RESULT_OK, intent);
         finish();
     }

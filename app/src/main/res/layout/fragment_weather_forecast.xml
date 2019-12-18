@@ -2,178 +2,161 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white">
+    style="@style/layoutMM"
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:overScrollMode="never"
-            android:scrollbars="none">
+    <HorizontalScrollView
+        style="@style/layoutMW"
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        android:scrollbars="none">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            style="@style/layoutWM88">
 
-                <FrameLayout
-                    android:id="@+id/frameLayout1"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+            <FrameLayout
+                android:id="@+id/frameLayout1"
+                style="@style/layoutMM"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                    <ImageView
-                        android:id="@+id/day1"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/day1"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:srcCompat="@drawable/nodata"
+                    tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/temperature1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
-                </FrameLayout>
+                <TextView
+                    android:id="@+id/temperature1"
+                    style="@style/layoutWW"
+                    android:layout_gravity="bottom|end"
+                    android:background="@android:color/white"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    tools:text="0/0" />
+            </FrameLayout>
 
-                <FrameLayout
-                    android:id="@+id/frameLayout2"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toEndOf="@+id/frameLayout1"
-                    app:layout_constraintTop_toTopOf="@+id/frameLayout1">
+            <FrameLayout
+                android:id="@+id/frameLayout2"
+                style="@style/layoutMM"
+                app:layout_constraintStart_toEndOf="@+id/frameLayout1"
+                app:layout_constraintTop_toTopOf="@+id/frameLayout1">
 
-                    <ImageView
-                        android:id="@+id/day2"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/day2"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="8dp"
+                    app:srcCompat="@drawable/nodata"
+                    tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/temperature2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                <TextView
+                    android:id="@+id/temperature2"
+                    style="@style/layoutWW"
+                    android:layout_gravity="bottom|end"
+                    android:background="@android:color/white"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    tools:text="0/0" />
 
-                </FrameLayout>
+            </FrameLayout>
 
-                <FrameLayout
-                    android:id="@+id/frameLayout3"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toEndOf="@+id/frameLayout2"
-                    app:layout_constraintTop_toTopOf="@+id/frameLayout2">
+            <FrameLayout
+                android:id="@+id/frameLayout3"
+                style="@style/layoutMM"
+                app:layout_constraintStart_toEndOf="@+id/frameLayout2"
+                app:layout_constraintTop_toTopOf="@+id/frameLayout2">
 
-                    <ImageView
-                        android:id="@+id/day3"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/day3"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="8dp"
+                    app:srcCompat="@drawable/nodata"
+                    tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/temperature3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                <TextView
+                    android:id="@+id/temperature3"
+                    style="@style/layoutWW"
+                    android:layout_gravity="bottom|end"
+                    android:background="@android:color/white"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    tools:text="0/0" />
 
-                </FrameLayout>
+            </FrameLayout>
 
-                <FrameLayout
-                    android:id="@+id/frameLayout4"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toEndOf="@+id/frameLayout3"
-                    app:layout_constraintTop_toTopOf="@+id/frameLayout3">
+            <FrameLayout
+                android:id="@+id/frameLayout4"
+                style="@style/layoutMM"
+                app:layout_constraintStart_toEndOf="@+id/frameLayout3"
+                app:layout_constraintTop_toTopOf="@+id/frameLayout3">
 
-                    <ImageView
-                        android:id="@+id/day4"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/day4"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="8dp"
+                    app:srcCompat="@drawable/nodata"
+                    tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/temperature4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                <TextView
+                    android:id="@+id/temperature4"
+                    style="@style/layoutWW"
+                    android:layout_gravity="bottom|end"
+                    android:background="@android:color/white"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    tools:text="0/0" />
 
-                </FrameLayout>
+            </FrameLayout>
 
-                <FrameLayout
-                    android:id="@+id/frameLayout5"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toEndOf="@+id/frameLayout4"
-                    app:layout_constraintTop_toTopOf="@+id/frameLayout4">
+            <FrameLayout
+                android:id="@+id/frameLayout5"
+                style="@style/layoutMM"
+                app:layout_constraintStart_toEndOf="@+id/frameLayout4"
+                app:layout_constraintTop_toTopOf="@+id/frameLayout4">
 
-                    <ImageView
-                        android:id="@+id/day5"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:layout_marginStart="8dp"
-                        app:srcCompat="@drawable/nodata"
-                        tools:ignore="ContentDescription" />
+                <ImageView
+                    android:id="@+id/day5"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginStart="8dp"
+                    app:srcCompat="@drawable/nodata"
+                    tools:ignore="ContentDescription" />
 
-                    <TextView
-                        android:id="@+id/temperature5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:background="@android:color/white"
-                        android:fontFamily="@font/roboto"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp"
-                        tools:text="0/0" />
+                <TextView
+                    android:id="@+id/temperature5"
+                    style="@style/layoutWW"
+                    android:layout_gravity="bottom|end"
+                    android:background="@android:color/white"
+                    android:fontFamily="@font/roboto"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    tools:text="0/0" />
 
-                </FrameLayout>
+            </FrameLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </HorizontalScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </HorizontalScrollView>
 
-        <TextView
-            android:id="@+id/today"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto"
-            android:gravity="center_horizontal"
-            android:text="@string/today"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+    <TextView
+        android:id="@+id/today"
+        style="@style/layoutMW"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_horizontal"
+        android:text="@string/today"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/layoutMW"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:orientation="horizontal">
@@ -193,8 +176,7 @@
 
             <TextView
                 android:id="@+id/todayDay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
                 android:text="@string/day"
@@ -204,8 +186,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/todayDay"
@@ -213,8 +194,7 @@
 
                 <TextView
                     android:id="@+id/todayDayForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/layoutMW"
                     android:fontFamily="@font/roboto"
                     android:text="@string/forecastText"
                     android:textColor="@android:color/black" />
@@ -222,8 +202,7 @@
 
             <TextView
                 android:id="@+id/todayDayTemperature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:background="@android:color/white"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
@@ -250,8 +229,7 @@
 
             <TextView
                 android:id="@+id/todayNight"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
                 android:text="@string/night"
@@ -261,8 +239,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/todayNight"
@@ -270,8 +247,7 @@
 
                 <TextView
                     android:id="@+id/todayNightForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/layoutMW"
                     android:fontFamily="@font/roboto"
                     android:text="@string/forecastText"
                     android:textColor="@android:color/black" />
@@ -279,8 +255,7 @@
 
             <TextView
                 android:id="@+id/todayNightTemperature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:background="@android:color/white"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
@@ -293,20 +268,18 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
-        <TextView
-            android:id="@+id/tomorrow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto"
-            android:gravity="center_horizontal"
-            android:text="@string/tomorrow"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
+    <TextView
+        android:id="@+id/tomorrow"
+        style="@style/layoutMW"
+        android:fontFamily="@font/roboto"
+        android:gravity="center_horizontal"
+        android:text="@string/tomorrow"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/layoutMW"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:orientation="horizontal">
@@ -326,8 +299,7 @@
 
             <TextView
                 android:id="@+id/tomorrowDay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
                 android:text="@string/day"
@@ -337,8 +309,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tomorrowDay"
@@ -346,8 +317,7 @@
 
                 <TextView
                     android:id="@+id/tomorrowDayForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/layoutMW"
                     android:fontFamily="@font/roboto"
                     android:text="@string/forecastText"
                     android:textColor="@android:color/black" />
@@ -355,8 +325,7 @@
 
             <TextView
                 android:id="@+id/tomorrowDayTemperature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:background="@android:color/white"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
@@ -383,8 +352,7 @@
 
             <TextView
                 android:id="@+id/tomorrowNight"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
                 android:text="@string/night"
@@ -394,8 +362,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tomorrowNight"
@@ -403,8 +370,7 @@
 
                 <TextView
                     android:id="@+id/tomorrowNightForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/layoutMW"
                     android:fontFamily="@font/roboto"
                     android:text="@string/forecastText"
                     android:textColor="@android:color/black" />
@@ -412,8 +378,7 @@
 
             <TextView
                 android:id="@+id/tomorrowNightTemperature"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/layoutMW"
                 android:background="@android:color/white"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"

@@ -5,15 +5,19 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<RecyclerViewAdapterSearchPage.ViewHolder> {
+public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<RecyclerViewAdapterSearchPage.ViewHolder> implements Filterable {
     private ArrayList<CityDataClassSearchPage> arrayList;
+    private ArrayList<CityDataClassSearchPage> arrayListFull;
     private Activity activity;
     private Context context;
 
@@ -22,6 +26,7 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
             this.arrayList = arrayList;
         else
             this.arrayList = new ArrayList<>();
+        arrayListFull = new ArrayList<>(Objects.requireNonNull(arrayList));
         this.activity = activity;
     }
 
@@ -34,7 +39,7 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         holder.cityName.setText(arrayList.get(position).city);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +53,38 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
     public int getItemCount() {
         return arrayList.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            ArrayList<CityDataClassSearchPage> filteredArrayList = new ArrayList<>();
+            if (constraint.length() == 0) {
+                filteredArrayList.addAll(arrayListFull);
+            } else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+                for (CityDataClassSearchPage cityDataClassSearchPage : arrayListFull) {
+                    if (cityDataClassSearchPage.city.toLowerCase().contains(filterPattern)) {
+                        filteredArrayList.add(cityDataClassSearchPage);
+                    }
+                }
+            }
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredArrayList;
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            arrayList.clear();
+            arrayList.addAll((ArrayList) results.values);
+            notifyDataSetChanged();
+        }
+    };
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView cityName;

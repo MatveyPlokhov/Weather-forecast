@@ -7,4 +7,7 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="day">Day</string>
     <string name="night">Night</string>
+    <string name="search">Search</string>
+    <string name="snackbarInfo">The city is added to the list</string>
+    <string name="ok" translatable="false">Ok</string>
 </resources>

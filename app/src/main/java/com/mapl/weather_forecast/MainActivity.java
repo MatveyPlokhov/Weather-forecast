@@ -5,12 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -18,11 +13,8 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Random;
 
-import static com.mapl.weather_forecast.R.id.recyclerViewSelectedListOfCities;
-
-public class MainActivity extends AppCompatActivity implements Postman {
+public class MainActivity extends AppCompatActivity {
     Random random = new Random();
-    ScrollView scrollView;
 
     ImageView day1, day2, day3, day4, day5,
             todayDayImage, todayNightImage, tomorrowDayImage, tomorrowNightImage;
@@ -34,8 +26,9 @@ public class MainActivity extends AppCompatActivity implements Postman {
 
     LinkedList<String> cityList;
 
-    CityListInHomePage cityListInHomePage;
     FragmentManager fragmentManager;
+    CityListInHomePage cityListInHomePage;
+    WeatherForecastFragment weatherForecastFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +36,9 @@ public class MainActivity extends AppCompatActivity implements Postman {
         setContentView(R.layout.activity_main);
         initView();
         initFragments();
-        //clickListeners();
     }
 
     private void initView() {
-        scrollView = findViewById(R.id.scrollView);
-
         day1 = findViewById(R.id.day1);
         day2 = findViewById(R.id.day2);
         day3 = findViewById(R.id.day3);
@@ -76,12 +66,12 @@ public class MainActivity extends AppCompatActivity implements Postman {
     private void initFragments() {
         fragmentManager = getSupportFragmentManager();
 
-        cityListInHomePage = (CityListInHomePage) fragmentManager.findFragmentById(recyclerViewSelectedListOfCities);
-        //cityListInSearchPage = (CityListInSearchPage) fragmentManager.findFragmentById(fragmentCities);
+        cityListInHomePage = (CityListInHomePage) fragmentManager.findFragmentById(R.id.fragmentSelectedListOfCities);
+        weatherForecastFragment = (WeatherForecastFragment) fragmentManager.findFragmentById(R.id.fragmentWeatherForecast);
 
-        /*fragmentManager.beginTransaction()
-                .hide(cityListInSearchPage)
-                .commit();*/
+        fragmentManager.beginTransaction()
+                .hide(weatherForecastFragment)
+                .commit();
     }
 
     private void initVariableForCity(String city) {
@@ -175,66 +165,20 @@ public class MainActivity extends AppCompatActivity implements Postman {
         day5.setImageResource(Integer.parseInt(parseDate[18]));
     }
 
-    private void clickListeners() {
-
-    }
-
-    @Override
-    public void getCityName(String cityName) {
-        /*selectCity = cityName;
-
-        fragmentManager.beginTransaction()
-                .hide(cityListInSearchPage)
-                .commit();
-
-        if (!cityList.contains(cityName)) {
-            addButtonInLayout(horizontalLinearLayoutCities,
-                    (int) getResources().getDimension(R.dimen.buttonSize), selectCity);
-            cityList.addFirst(selectCity);
-            initVariableForCity(selectCity);
-            allVisible();
-        }
-        writeVariableForCity(selectCity);*/
-    }
-
-    private void addButtonInLayout(LinearLayout linearLayout, int height, String city) {
-        final Button button = new Button(getApplicationContext());
-        button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height));
-        button.setText(city);
-        linearLayout.addView(button, 0);
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectCity = (String) button.getText();
-                writeVariableForCity(selectCity);
-            }
-        });
-    }
-
-    private void allVisible() {
-        scrollView.setVisibility(View.VISIBLE);
-    }
-
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("fiveDays", fiveDays);
+        /*outState.putSerializable("fiveDays", fiveDays);
         outState.putSerializable("cityList", cityList);
-        outState.putString("selectCity", selectCity);
+        outState.putString("selectCity", selectCity);*/
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        fiveDays = (HashMap<String, String>) savedInstanceState.getSerializable("fiveDays");
+        /*fiveDays = (HashMap<String, String>) savedInstanceState.getSerializable("fiveDays");
         cityList = (LinkedList<String>) savedInstanceState.getSerializable("cityList");
         selectCity = savedInstanceState.getString("selectCity");
-        /*for (int i = cityList.size() - 1; i >= 0; i--) {
-            addButtonInLayout(horizontalLinearLayoutCities,
-                    (int) getResources().getDimension(R.dimen.buttonSize), cityList.get(i));
-        }*/
-        writeVariableForCity(selectCity);
-        allVisible();
+        writeVariableForCity(selectCity);*/
     }
 }
