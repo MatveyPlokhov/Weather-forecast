@@ -12,12 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-    private ArrayList<CityDataClass> arrayList;
+public class RecyclerViewAdapterHomePage extends RecyclerView.Adapter<RecyclerViewAdapterHomePage.ViewHolder> {
+    private ArrayList<CityDataClassHomePage> arrayList;
     private Activity activity;
     private Context context;
 
-    RecyclerViewAdapter(ArrayList<CityDataClass> arrayList, Activity activity) {
+    public RecyclerViewAdapterHomePage(ArrayList<CityDataClassHomePage> arrayList, Activity activity) {
         if (arrayList != null)
             this.arrayList = arrayList;
         else
@@ -29,19 +29,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.city_card, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.card_city_in_home_page, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.cityName.setText(arrayList.get(position).city);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((Postman) activity).getCityName(arrayList.get(position).city);
-            }
-        });
     }
 
     @Override
@@ -49,12 +43,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return arrayList.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView cityName;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            cityName = itemView.findViewById(R.id.cityName);
+            cityName = itemView.findViewById(R.id.cityNameHP);
         }
     }
 }

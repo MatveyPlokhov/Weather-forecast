@@ -1,9 +1,9 @@
 package com.mapl.weather_forecast;
 
-public class CityDataClass {
+public class CityDataClassHomePage {
     String city;
 
-    public CityDataClass(String city) {
+    public CityDataClassHomePage(String city) {
         this.city = city;
     }
 }
