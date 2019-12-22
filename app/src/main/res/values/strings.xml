@@ -10,4 +10,5 @@
     <string name="search">Search</string>
     <string name="snackbarInfo">The city is added to the list</string>
     <string name="ok" translatable="false">Ok</string>
+    <string name="weather_data_false">Data cannot be updated</string>
 </resources>

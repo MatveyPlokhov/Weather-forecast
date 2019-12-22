@@ -13,12 +13,10 @@
 
     <TextView
         android:id="@+id/cityNameSP"
-        style="@style/layoutWW88"
+        style="@style/layoutWW_M88"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:fontFamily="@font/roboto"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textColor="@android:color/black"
         android:textSize="24sp"
-        tools:ignore="HardcodedText"
         tools:text="City" />
 </androidx.cardview.widget.CardView>

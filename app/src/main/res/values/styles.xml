@@ -32,23 +32,43 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="layoutMM88" parent="layoutMM">
+    <style name="layoutMM_P88" parent="layoutMM">
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
     </style>
 
-    <style name="layoutMW88" parent="layoutMW">
+    <style name="layoutMW_P88" parent="layoutMW">
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
     </style>
 
-    <style name="layoutWM88" parent="layoutWM">
+    <style name="layoutWM_P88" parent="layoutWM">
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
     </style>
 
-    <style name="layoutWW88" parent="layoutWW">
+    <style name="layoutWW_P88" parent="layoutWW">
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="layoutMM_M88" parent="layoutMM">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="layoutMW_M88" parent="layoutMW">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="layoutWM_M88" parent="layoutWM">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <style name="layoutWW_M88" parent="layoutWW">
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
     </style>
 </resources>

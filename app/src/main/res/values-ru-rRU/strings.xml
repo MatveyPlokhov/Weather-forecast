@@ -8,4 +8,5 @@
     <string name="night">Ночь</string>
     <string name="search">Поиск</string>
     <string name="snackbarInfo">Город добавлен в список</string>
+    <string name="weather_data_false">Данные не могут обновиться</string>
 </resources>

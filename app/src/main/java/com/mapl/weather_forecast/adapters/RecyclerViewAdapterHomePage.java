@@ -1,4 +1,4 @@
-package com.mapl.weather_forecast;
+package com.mapl.weather_forecast.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,6 +9,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.mapl.weather_forecast.Postman;
+import com.mapl.weather_forecast.R;
 
 import java.util.ArrayList;
 
@@ -35,7 +38,14 @@ public class RecyclerViewAdapterHomePage extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.cityName.setText(arrayList.get(position).city);
+        final String cityName = arrayList.get(position).city;
+        holder.cityName.setText(cityName);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((Postman) activity).getCityName(cityName);
+            }
+        });
     }
 
     @Override

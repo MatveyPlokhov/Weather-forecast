@@ -9,11 +9,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements Postman {
     Random random = new Random();
 
     ImageView day1, day2, day3, day4, day5,
@@ -21,13 +20,10 @@ public class MainActivity extends AppCompatActivity {
     TextView temperature1, temperature2, temperature3, temperature4, temperature5,
             todayDayTemperature, todayNightTemperature, tomorrowDayTemperature, tomorrowNightTemperature;
 
-    String selectCity;
     HashMap<String, String> fiveDays;
 
-    LinkedList<String> cityList;
-
     FragmentManager fragmentManager;
-    CityListInHomePage cityListInHomePage;
+    CityListFragment cityListFragment;
     WeatherForecastFragment weatherForecastFragment;
 
     @Override
@@ -39,34 +35,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        day1 = findViewById(R.id.day1);
-        day2 = findViewById(R.id.day2);
-        day3 = findViewById(R.id.day3);
-        day4 = findViewById(R.id.day4);
-        day5 = findViewById(R.id.day5);
-        todayDayImage = findViewById(R.id.todayDayImage);
-        todayNightImage = findViewById(R.id.todayNightImage);
-        tomorrowDayImage = findViewById(R.id.tomorrowDayImage);
-        tomorrowNightImage = findViewById(R.id.tomorrowNightImage);
 
-        temperature1 = findViewById(R.id.temperature1);
-        temperature2 = findViewById(R.id.temperature2);
-        temperature3 = findViewById(R.id.temperature3);
-        temperature4 = findViewById(R.id.temperature4);
-        temperature5 = findViewById(R.id.temperature5);
-        todayDayTemperature = findViewById(R.id.todayDayTemperature);
-        todayNightTemperature = findViewById(R.id.todayNightTemperature);
-        tomorrowDayTemperature = findViewById(R.id.tomorrowDayTemperature);
-        tomorrowNightTemperature = findViewById(R.id.tomorrowNightTemperature);
-
-        fiveDays = new HashMap<>();
-        cityList = new LinkedList<>();
     }
 
     private void initFragments() {
         fragmentManager = getSupportFragmentManager();
 
-        cityListInHomePage = (CityListInHomePage) fragmentManager.findFragmentById(R.id.fragmentSelectedListOfCities);
+        cityListFragment = (CityListFragment) fragmentManager.findFragmentById(R.id.fragmentSelectedListOfCities);
         weatherForecastFragment = (WeatherForecastFragment) fragmentManager.findFragmentById(R.id.fragmentWeatherForecast);
 
         fragmentManager.beginTransaction()
@@ -180,5 +155,10 @@ public class MainActivity extends AppCompatActivity {
         cityList = (LinkedList<String>) savedInstanceState.getSerializable("cityList");
         selectCity = savedInstanceState.getString("selectCity");
         writeVariableForCity(selectCity);*/
+    }
+
+    @Override
+    public void getCityName(String cityName) {
+        weatherForecastFragment.updateWeatherData(cityName);
     }
 }
