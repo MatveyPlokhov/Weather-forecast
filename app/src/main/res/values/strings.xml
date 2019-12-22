@@ -1,8 +1,5 @@
 <resources>
     <string name="app_name" translatable="false">Weather forecast</string>
-    <string name="forecastText">description the weather description the weather description the weather description the weather</string>
-    <string name="humidity">Humidity</string>
-    <string name="cloudiness">Cloudiness</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="day">Day</string>
@@ -11,4 +8,10 @@
     <string name="snackbarInfo">The city is added to the list</string>
     <string name="ok" translatable="false">Ok</string>
     <string name="weather_data_false">Data cannot be updated</string>
+    <string name="temperature">Temperature</string>
+    <string name="feels_like">Feels like</string>
+    <string name="temperature_min">Temperature min</string>
+    <string name="temperature_max">Temperature max</string>
+    <string name="pressure">Pressure</string>
+    <string name="humidity">Humidity</string>
 </resources>

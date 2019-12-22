@@ -18,6 +18,7 @@ public class WeatherDataLoader {
     private static final int ALL_GOOD = 200;
 
     public static JSONObject getJSONData(String city) {
+
         try {
             URL url = new URL(String.format(OPEN_WEATHER_API_URL, city));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();

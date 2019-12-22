@@ -26,6 +26,9 @@ import com.mapl.weather_forecast.loaders.WeatherDataLoader;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Date;
+import java.util.Locale;
+
 public class WeatherForecastFragment extends Fragment {
     private final Handler handler = new Handler();
     private WeatherForecast weatherForecast;
@@ -33,7 +36,7 @@ public class WeatherForecastFragment extends Fragment {
     private View rootView;
     private Activity activity;
     private ImageView imageViewToday;
-    private TextView cityName;
+    private TextView cityName, textView;
     private String mainCity;
 
     private SQLiteDatabase sqLiteDatabase;
@@ -63,6 +66,7 @@ public class WeatherForecastFragment extends Fragment {
         weatherForecast = new WeatherForecast(getContext());
         imageViewToday = rootView.findViewById(R.id.imageViewToday);
         cityName = rootView.findViewById(R.id.cityNameW);
+        textView = rootView.findViewById(R.id.textWeather);
         constraintLayout = rootView.findViewById(R.id.weatherConstraintLayout);
 
         initSQLite();
@@ -117,6 +121,10 @@ public class WeatherForecastFragment extends Fragment {
             JSONObject main = jsonObject.getJSONObject("main");
 
             setPlaceName(jsonObject);
+            setAll(details, main);
+            imageViewToday.setImageResource(setWeatherIcon(details.getInt("id"),
+                    jsonObject.getJSONObject("sys").getLong("sunrise") * 1000,
+                    jsonObject.getJSONObject("sys").getLong("sunset") * 1000));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,6 +133,84 @@ public class WeatherForecastFragment extends Fragment {
     private void setPlaceName(JSONObject jsonObject) throws JSONException {
         String cityText = jsonObject.getString("name");
         cityName.setText(cityText);
+    }
+
+    private void setAll(JSONObject details, JSONObject main) throws JSONException {
+        String detailsText = details.getString("description").toUpperCase() + "\n"
+                + getResources().getString(R.string.temperature) + ": "
+                + String.format(Locale.getDefault(), "%.2f", main.getDouble("temp")) + "\u2103\n"
+                + getResources().getString(R.string.feels_like) + ": "
+                + String.format(Locale.getDefault(), "%.2f", main.getDouble("feels_like")) + "\u2103\n"
+                + getResources().getString(R.string.temperature_min) + ": "
+                + String.format(Locale.getDefault(), "%.2f", main.getDouble("temp_min")) + "\u2103\n"
+                + getResources().getString(R.string.temperature_max) + ": "
+                + String.format(Locale.getDefault(), "%.2f", main.getDouble("temp_max")) + "\u2103\n"
+                + getResources().getString(R.string.pressure) + ": "
+                + main.getInt("pressure") * 0.75 + "\n"
+                + getResources().getString(R.string.humidity) + ": "
+                + main.getString("humidity") + "%";
+        textView.setText(detailsText);
+    }
+
+    private int setWeatherIcon(int actualID, long sunrise, long sunset) {
+        int id = actualID / 100;
+        long currentTime = new Date().getTime();
+        if (currentTime >= sunrise && currentTime < sunset) {
+            switch (id) {
+                case (2):
+                    return R.drawable.thunderstorm;
+                case (3):
+                    return R.drawable.shower_rain;
+                case (5):
+                    if (actualID >= 500 && actualID <= 504)
+                        return R.drawable.rain_d;
+                    else if (actualID == 511)
+                        return R.drawable.snow;
+                    else
+                        return R.drawable.shower_rain;
+                case (6):
+                    return R.drawable.snow;
+                case (7):
+                    return R.drawable.mist;
+                case (8):
+                    if (actualID == 800)
+                        return R.drawable.clear_sky_d;
+                    else if (actualID == 801)
+                        return R.drawable.few_clouds_d;
+                    else if (actualID == 802)
+                        return R.drawable.scattered_clouds;
+                    else if (actualID == 803 || actualID == 804)
+                        return R.drawable.broken_clouds;
+            }
+        } else {
+            switch (id) {
+                case (2):
+                    return R.drawable.thunderstorm;
+                case (3):
+                    return R.drawable.shower_rain;
+                case (5):
+                    if (actualID >= 500 && actualID <= 504)
+                        return R.drawable.rain_n;
+                    else if (actualID == 511)
+                        return R.drawable.snow;
+                    else
+                        return R.drawable.shower_rain;
+                case (6):
+                    return R.drawable.snow;
+                case (7):
+                    return R.drawable.mist;
+                case (8):
+                    if (actualID == 800)
+                        return R.drawable.clear_sky_n;
+                    else if (actualID == 801)
+                        return R.drawable.few_clouds_n;
+                    else if (actualID == 802)
+                        return R.drawable.scattered_clouds;
+                    else if (actualID == 803 || actualID == 804)
+                        return R.drawable.broken_clouds;
+            }
+        }
+        return R.drawable.ic_launcher_foreground;
     }
 
     private void noData() {

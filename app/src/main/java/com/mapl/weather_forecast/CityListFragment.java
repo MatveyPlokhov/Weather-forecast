@@ -98,8 +98,8 @@ public class CityListFragment extends Fragment {
             String city = Objects.requireNonNull(data).getStringExtra(SearchActivity.CITY_KEY);
             if (!cityInDB(city)) {
                 addCityInDB(city);
-                ((Postman) activity).getCityName(city);
             }
+            ((Postman) activity).getCityName(city);
         }
     }
 

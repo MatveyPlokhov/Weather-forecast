@@ -44,15 +44,22 @@
 
             <ImageView
                 android:id="@+id/imageViewToday"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                style="@style/layoutWW_M88"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/today"
-                card_view:srcCompat="@drawable/nodata" />
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/textWeather"
+                style="@style/layoutWW"
+                android:layout_marginTop="8dp"
+                android:text="Text"
+                app:layout_constraintStart_toEndOf="@+id/imageViewToday"
+                app:layout_constraintTop_toBottomOf="@+id/today"
+                tools:ignore="HardcodedText" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
