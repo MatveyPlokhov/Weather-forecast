@@ -18,7 +18,8 @@
 
     <TextView
         android:id="@+id/cityNameHP"
-        style="@style/layoutWW88"
+        style="@style/layoutWW_M88"
         android:layout_gravity="center"
+        android:fontFamily="@font/roboto"
         tools:text="City" />
 </androidx.cardview.widget.CardView>

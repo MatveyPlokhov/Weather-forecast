@@ -28,8 +28,9 @@
         card_view:cardCornerRadius="8dp">
 
         <TextView
-            style="@style/layoutWW88"
+            style="@style/layoutWW"
             android:layout_gravity="center"
+            android:fontFamily="@font/roboto"
             android:text="+"
             tools:ignore="HardcodedText" />
     </androidx.cardview.widget.CardView>

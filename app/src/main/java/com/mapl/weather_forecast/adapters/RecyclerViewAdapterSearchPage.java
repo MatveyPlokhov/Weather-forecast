@@ -1,4 +1,4 @@
-package com.mapl.weather_forecast;
+package com.mapl.weather_forecast.adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,12 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.mapl.weather_forecast.Postman;
+import com.mapl.weather_forecast.R;
+import com.mapl.weather_forecast.WeatherForecastFragment;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -21,7 +26,7 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
     private Activity activity;
     private Context context;
 
-    RecyclerViewAdapterSearchPage(ArrayList<CityDataClassSearchPage> arrayList, Activity activity) {
+    public RecyclerViewAdapterSearchPage(ArrayList<CityDataClassSearchPage> arrayList, Activity activity) {
         if (arrayList != null)
             this.arrayList = arrayList;
         else

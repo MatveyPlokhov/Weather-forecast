@@ -4,6 +4,6 @@
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@drawable/sun" />
+            android:src="@drawable/clear_sky_d" />
     </item>
 </layer-list>

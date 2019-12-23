@@ -10,17 +10,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.mapl.weather_forecast.adapters.CityDataClassHomePage;
+import com.mapl.weather_forecast.adapters.RecyclerViewAdapterHomePage;
 import com.mapl.weather_forecast.databases.WeatherForecast;
 
 import java.util.ArrayList;
@@ -28,18 +27,18 @@ import java.util.Objects;
 
 import static android.app.Activity.RESULT_OK;
 
-public class CityListInHomePage extends Fragment {
+public class CityListFragment extends Fragment {
     private RecyclerViewAdapterHomePage recyclerViewAdapter;
-    Activity activity;
-    RecyclerView recyclerView;
-    WeatherForecast weatherForecast;
-    CardView cardView;
+    private Activity activity;
+    private RecyclerView recyclerView;
+    private WeatherForecast weatherForecast;
+    private CardView cardView;
     private ArrayList<CityDataClassHomePage> arrayList;
-    public static int RESULT_KEY = 1;
+    private static int RESULT_KEY = 1;
 
-    SQLiteDatabase sqLiteDatabase;
-    ContentValues contentValues;
-    Cursor cursor;
+    private SQLiteDatabase sqLiteDatabase;
+    private ContentValues contentValues;
+    private Cursor cursor;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -97,8 +96,10 @@ public class CityListInHomePage extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_KEY && resultCode == RESULT_OK) {
             String city = Objects.requireNonNull(data).getStringExtra(SearchActivity.CITY_KEY);
-            if (!cityInDB(city))
+            if (!cityInDB(city)) {
                 addCityInDB(city);
+            }
+            ((Postman) activity).getCityName(city);
         }
     }
 
@@ -123,15 +124,6 @@ public class CityListInHomePage extends Fragment {
         cursor.close();
         weatherForecast.close();
         addCities();
-        CoordinatorLayout coordinatorLayout = activity.findViewById(R.id.coordinatorLayout);
-        String text = getResources().getString(R.string.snackbarInfo);
-        Snackbar.make(coordinatorLayout, text + " (" + city + ")", Snackbar.LENGTH_LONG)
-                .setAction(R.string.ok, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                    }
-                }).show();
     }
 
     private void addElementsInArray() {

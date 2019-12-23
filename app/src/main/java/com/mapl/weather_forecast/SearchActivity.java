@@ -13,6 +13,9 @@ import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.SearchView;
 
+import com.mapl.weather_forecast.adapters.CityDataClassSearchPage;
+import com.mapl.weather_forecast.adapters.RecyclerViewAdapterSearchPage;
+
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity implements Postman {
