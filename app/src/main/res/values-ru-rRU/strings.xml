@@ -12,4 +12,10 @@
     <string name="temperature_max">Температура max</string>
     <string name="pressure">Давление</string>
     <string name="humidity">Влажность</string>
+    <string name="locations">Местоположения</string>
+    <string name="settings">Настройки</string>
+    <string name="help_feedback"><![CDATA[Справка/отзыв]]></string>
+    <string name="about_weather_forecast">О WeatherForecast</string>
+    <string name="add_new_location">Новое местоположение</string>
+    <string name="person">Пользователь</string>
 </resources>

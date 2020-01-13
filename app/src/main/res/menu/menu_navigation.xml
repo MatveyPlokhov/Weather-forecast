@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <group
+        android:checkableBehavior="single"
+        android:title="@string/locations">
+
+    </group>
+
+    <item
+        android:id="@+id/addLocationItem"
+        android:gravity="center_horizontal"
+        android:icon="@drawable/add"
+        android:title="@string/add_new_location" />
+
+    <group android:id="@+id/group_preferences">
+        <item
+            android:id="@+id/settingsItem"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/settings" />
+    </group>
+    <group android:id="@+id/group_more">
+        <item
+            android:id="@+id/feedbackItem"
+            android:title="@string/help_feedback" />
+        <item
+            android:id="@+id/aboutItem"
+            android:title="@string/about_weather_forecast" />
+    </group>
+</menu>

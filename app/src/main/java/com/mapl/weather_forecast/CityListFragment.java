@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,11 +27,9 @@ import java.util.Objects;
 import static android.app.Activity.RESULT_OK;
 
 public class CityListFragment extends Fragment {
-    private RecyclerViewAdapterHomePage recyclerViewAdapter;
     private Activity activity;
     private RecyclerView recyclerView;
     private WeatherForecast weatherForecast;
-    private CardView cardView;
     private ArrayList<CityDataClassHomePage> arrayList;
     private static int RESULT_KEY = 1;
 
@@ -53,14 +50,13 @@ public class CityListFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_selected_list_of_cities, container, false);
         initView(rootView);
         addCities();
-        clickListeners();
         return rootView;
     }
 
     private void initSQLite() {
         sqLiteDatabase = weatherForecast.getWritableDatabase();
         contentValues = new ContentValues();
-        cursor = sqLiteDatabase.query(weatherForecast.TABLE_WEATHER_FORECAST,
+        cursor = sqLiteDatabase.query(WeatherForecast.TABLE_WEATHER_FORECAST,
                 null, null, null, null, null, null);
     }
 
@@ -68,7 +64,6 @@ public class CityListFragment extends Fragment {
         arrayList = new ArrayList<>();
         weatherForecast = new WeatherForecast(getContext());
         recyclerView = view.findViewById(R.id.recyclerViewSelectedListOfCities);
-        cardView = view.findViewById(R.id.addCityHP);
     }
 
     private void addCities() {
@@ -76,19 +71,14 @@ public class CityListFragment extends Fragment {
                 (getContext(), LinearLayoutManager.HORIZONTAL, false);
 
         addElementsInArray();
-        recyclerViewAdapter = new RecyclerViewAdapterHomePage(arrayList, activity);
+        RecyclerViewAdapterHomePage recyclerViewAdapter = new RecyclerViewAdapterHomePage(arrayList, activity);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(recyclerViewAdapter);
     }
 
-    private void clickListeners() {
-        cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), SearchActivity.class);
-                startActivityForResult(intent, RESULT_KEY);
-            }
-        });
+    void searchActivityCall() {
+        Intent intent = new Intent(getContext(), SearchActivity.class);
+        startActivityForResult(intent, RESULT_KEY);
     }
 
     @Override
@@ -96,19 +86,26 @@ public class CityListFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RESULT_KEY && resultCode == RESULT_OK) {
             String city = Objects.requireNonNull(data).getStringExtra(SearchActivity.CITY_KEY);
-            if (!cityInDB(city)) {
-                addCityInDB(city);
+            Double lat = data.getDoubleExtra(SearchActivity.LAT_KEY, 0);
+            Double lon = data.getDoubleExtra(SearchActivity.LON_KEY, 0);
+
+            if (!cityInDB(city, lat, lon)) {
+                addCityInDB(city, lat, lon);
             }
-            ((Postman) activity).getCityName(city);
+            ((Postman) activity).getCityInfo(city, lat, lon);
         }
     }
 
-    private boolean cityInDB(String city) {
+    private boolean cityInDB(String city, Double lat, Double lon) {
         initSQLite();
         if (cursor.moveToFirst()) {
-            int nameIndex = cursor.getColumnIndex(weatherForecast.KEY_NAME);
+            int nameIndex = cursor.getColumnIndex(WeatherForecast.KEY_NAME);
+            int latIndex = cursor.getColumnIndex(WeatherForecast.KEY_LAT);
+            int lonIndex = cursor.getColumnIndex(WeatherForecast.KEY_LON);
             do {
-                if (city.equals(cursor.getString(nameIndex)))
+                if (city.equals(cursor.getString(nameIndex)) &&
+                        lat == cursor.getDouble(latIndex) &&
+                        lon == cursor.getDouble(lonIndex))
                     return true;
             } while (cursor.moveToNext());
             cursor.close();
@@ -117,10 +114,12 @@ public class CityListFragment extends Fragment {
         return false;
     }
 
-    private void addCityInDB(String city) {
+    private void addCityInDB(String city, Double lat, Double lon) {
         initSQLite();
-        contentValues.put(weatherForecast.KEY_NAME, city);
-        sqLiteDatabase.insert(weatherForecast.TABLE_WEATHER_FORECAST, null, contentValues);
+        contentValues.put(WeatherForecast.KEY_NAME, city);
+        contentValues.put(WeatherForecast.KEY_LAT, lat);
+        contentValues.put(WeatherForecast.KEY_LON, lon);
+        sqLiteDatabase.insert(WeatherForecast.TABLE_WEATHER_FORECAST, null, contentValues);
         cursor.close();
         weatherForecast.close();
         addCities();
@@ -130,14 +129,17 @@ public class CityListFragment extends Fragment {
         initSQLite();
         arrayList.clear();
         if (cursor.moveToFirst()) {
-            int nameIndex = cursor.getColumnIndex(weatherForecast.KEY_NAME);
+            int nameIndex = cursor.getColumnIndex(WeatherForecast.KEY_NAME);
+            int latIndex = cursor.getColumnIndex(WeatherForecast.KEY_LAT);
+            int lonIndex = cursor.getColumnIndex(WeatherForecast.KEY_LON);
             do {
                 String cityName = cursor.getString(nameIndex);
-                arrayList.add(new CityDataClassHomePage(cityName));
+                Double lat = cursor.getDouble(latIndex);
+                Double lon = cursor.getDouble(lonIndex);
+                arrayList.add(new CityDataClassHomePage(cityName, lat, lon));
             } while (cursor.moveToNext());
             cursor.close();
             weatherForecast.close();
         }
     }
-
 }

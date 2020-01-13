@@ -1,55 +1,56 @@
 package com.mapl.weather_forecast.adapters;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.button.MaterialButton;
 import com.mapl.weather_forecast.Postman;
 import com.mapl.weather_forecast.R;
-import com.mapl.weather_forecast.WeatherForecastFragment;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
-public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<RecyclerViewAdapterSearchPage.ViewHolder> implements Filterable {
+public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<RecyclerViewAdapterSearchPage.ViewHolder> {
     private ArrayList<CityDataClassSearchPage> arrayList;
-    private ArrayList<CityDataClassSearchPage> arrayListFull;
+    private LatLng center;
     private Activity activity;
-    private Context context;
 
-    public RecyclerViewAdapterSearchPage(ArrayList<CityDataClassSearchPage> arrayList, Activity activity) {
-        if (arrayList != null)
-            this.arrayList = arrayList;
-        else
-            this.arrayList = new ArrayList<>();
-        arrayListFull = new ArrayList<>(Objects.requireNonNull(arrayList));
+    public RecyclerViewAdapterSearchPage(ArrayList<CityDataClassSearchPage> arrayList, final Activity activity) {
+        this.arrayList = arrayList;
         this.activity = activity;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.card_city_in_search_page, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_city_in_search_page, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        String cityInfo = arrayList.get(position).description;
+        center = new LatLng(arrayList.get(position).lat, arrayList.get(position).lon);
         holder.cityName.setText(arrayList.get(position).city);
+        holder.cityAddress.setText(cityInfo);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((Postman) activity).getCityName(arrayList.get(position).city);
+                ((Postman) activity).getCityInfo(
+                        arrayList.get(position).city
+                        , arrayList.get(position).lat
+                        , arrayList.get(position).lon);
             }
         });
     }
@@ -59,44 +60,55 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
         return arrayList.size();
     }
 
-    @Override
-    public Filter getFilter() {
-        return filter;
-    }
-
-    private Filter filter = new Filter() {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            ArrayList<CityDataClassSearchPage> filteredArrayList = new ArrayList<>();
-            if (constraint.length() == 0) {
-                filteredArrayList.addAll(arrayListFull);
-            } else {
-                String filterPattern = constraint.toString().toLowerCase().trim();
-                for (CityDataClassSearchPage cityDataClassSearchPage : arrayListFull) {
-                    if (cityDataClassSearchPage.city.toLowerCase().contains(filterPattern)) {
-                        filteredArrayList.add(cityDataClassSearchPage);
-                    }
-                }
-            }
-            FilterResults filterResults = new FilterResults();
-            filterResults.values = filteredArrayList;
-            return filterResults;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            arrayList.clear();
-            arrayList.addAll((ArrayList) results.values);
-            notifyDataSetChanged();
-        }
-    };
-
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements OnMapReadyCallback {
         TextView cityName;
+        TextView cityAddress;
+        MapView mapView;
+        MaterialButton materialButton;
+        OnMapReadyCallback onMapReadyCallback;
+        Boolean check;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            check = false;
+            onMapReadyCallback = this;
             cityName = itemView.findViewById(R.id.cityNameSP);
+            cityAddress = itemView.findViewById(R.id.cityAddressSP);
+            materialButton = itemView.findViewById(R.id.material_icon_button);
+            mapView = itemView.findViewById(R.id.map);
+            materialButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mapView.getVisibility() == View.GONE) {
+                        mapView.setVisibility(View.VISIBLE);
+                        materialButton.setIconResource(R.drawable.arrow_up);
+                        if (mapView != null) {
+                            if (!check) {
+                                mapView.onCreate(null);
+                                mapView.getMapAsync(onMapReadyCallback);
+                                check = true;
+                            } else {
+                                mapView.onResume();
+                            }
+                        }
+                    } else {
+                        mapView.onPause();
+                        materialButton.setIconResource(R.drawable.arrow_down);
+                        mapView.setVisibility(View.GONE);
+                    }
+
+                }
+            });
+        }
+
+        @Override
+        public void onMapReady(GoogleMap googleMap) {
+            mapView.onLowMemory();
+            googleMap.getUiSettings().setMapToolbarEnabled(false);
+            googleMap.getUiSettings().setAllGesturesEnabled(false);
+            googleMap.addMarker(new MarkerOptions().position(center));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 13f));
+            mapView.onResume();
         }
     }
 }
