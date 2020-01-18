@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.MapView;
 import com.mapl.weather_forecast.adapters.CityDataClassSearchPage;
 import com.mapl.weather_forecast.adapters.RecyclerViewAdapterSearchPage;
 import com.mapl.weather_forecast.loaders.CityDataLoader;
@@ -30,6 +31,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
     private ArrayList<CityDataClassSearchPage> arrayList;
     private RecyclerView recyclerView;
     private DataLoader dataLoader;
+    MapView bigMapView;
     Toolbar toolbar;
 
     final static String CITY_KEY = "CITY_KEY";
@@ -39,6 +41,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         setTheme(R.style.AppDefault);
+        setTitle("");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         initToolbar();
@@ -52,6 +55,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
 
     private void initView() {
         recyclerView = findViewById(R.id.recyclerViewCityList);
+        bigMapView = findViewById(R.id.bigMapView);
     }
 
     @Override
@@ -60,6 +64,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
         MenuItem menuItem = menu.findItem(R.id.action_search);
         MenuItem microItem = menu.findItem(R.id.action_micro);
         SearchView searchView = (SearchView) menuItem.getActionView();
+        new BottomActivity(SearchActivity.this, searchView);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
