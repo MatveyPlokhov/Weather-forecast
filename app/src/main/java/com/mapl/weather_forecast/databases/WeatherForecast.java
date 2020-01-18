@@ -8,12 +8,14 @@ import androidx.annotation.Nullable;
 
 public class WeatherForecast extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "weatherForecastDb";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "weatherForecastDb";
     public static final String TABLE_WEATHER_FORECAST = "weatherForecast";
 
-    public static final String KEY_ID = "_id";
+    private static final String KEY_ID = "_id";
     public static final String KEY_NAME = "name";
+    public static final String KEY_LAT = "lat";
+    public static final String KEY_LON = "lon";
 
     public WeatherForecast(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -23,7 +25,9 @@ public class WeatherForecast extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_WEATHER_FORECAST + "("
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + KEY_NAME + " TEXT" + ")");
+                + KEY_NAME + " TEXT,"
+                + KEY_LAT + " REAL,"
+                + KEY_LON + " REAL" + ")");
     }
 
     @Override

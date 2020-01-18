@@ -1,5 +1,7 @@
 package com.mapl.weather_forecast.loaders;
 
+import android.annotation.SuppressLint;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -10,17 +12,18 @@ import java.util.Locale;
 
 public class WeatherDataLoader {
     private static final String OPEN_WEATHER_API_KEY = "8b872d9c30ed844f1fa73c7172a8313f";
+    @SuppressLint("ConstantLocale")
     private static final String OPEN_WEATHER_API_URL =
-            "https://api.openweathermap.org/data/2.5/weather?q=%s&units=metric&lang="
+            "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&units=metric&lang="
                     + Locale.getDefault().getLanguage();
     private static final String KEY = "x-api-key";
     private static final String RESPONSE = "cod";
     private static final int ALL_GOOD = 200;
 
-    public static JSONObject getJSONData(String city) {
+    public static JSONObject getJSONData(Double lat, Double lon) {
 
         try {
-            URL url = new URL(String.format(OPEN_WEATHER_API_URL, city));
+            URL url = new URL(String.format(OPEN_WEATHER_API_URL, lat.toString(), lon.toString()));
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.addRequestProperty(KEY, OPEN_WEATHER_API_KEY);
 
@@ -32,6 +35,7 @@ public class WeatherDataLoader {
                 rawData.append(tempVariable).append("\n");
             }
             reader.close();
+            connection.disconnect();
             JSONObject jsonObject = new JSONObject(rawData.toString());
             if (jsonObject.getInt(RESPONSE) != ALL_GOOD) {
                 return null;

@@ -1,7 +1,6 @@
 package com.mapl.weather_forecast;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -38,9 +37,8 @@ public class WeatherForecastFragment extends Fragment {
     private ImageView imageViewToday;
     private TextView cityName, textView;
     private String mainCity;
+    private Double mainLat, mainLon;
 
-    private SQLiteDatabase sqLiteDatabase;
-    private ContentValues contentValues;
     private Cursor cursor;
 
     @Override
@@ -56,7 +54,7 @@ public class WeatherForecastFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_weather_forecast, container, false);
         initView();
         if (mainCity != null)
-            updateWeatherData(mainCity);
+            updateWeatherData(mainCity, mainLat, mainLon);
         else
             noData();
         return rootView;
@@ -71,7 +69,9 @@ public class WeatherForecastFragment extends Fragment {
 
         initSQLite();
         if (cursor.moveToFirst()) {
-            mainCity = cursor.getString(cursor.getColumnIndex(weatherForecast.KEY_NAME));
+            mainCity = cursor.getString(cursor.getColumnIndex(WeatherForecast.KEY_NAME));
+            mainLat = cursor.getDouble(cursor.getColumnIndex(WeatherForecast.KEY_LAT));
+            mainLon = cursor.getDouble(cursor.getColumnIndex(WeatherForecast.KEY_LON));
         } else {
             mainCity = null;
         }
@@ -80,18 +80,17 @@ public class WeatherForecastFragment extends Fragment {
     }
 
     private void initSQLite() {
-        sqLiteDatabase = weatherForecast.getWritableDatabase();
-        contentValues = new ContentValues();
-        cursor = sqLiteDatabase.query(weatherForecast.TABLE_WEATHER_FORECAST,
+        SQLiteDatabase sqLiteDatabase = weatherForecast.getWritableDatabase();
+        cursor = sqLiteDatabase.query(WeatherForecast.TABLE_WEATHER_FORECAST,
                 null, null, null, null, null, null);
     }
 
 
-    public void updateWeatherData(final String cityName) {
+    void updateWeatherData(final String cityName, final Double lat, final Double lon) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final JSONObject jsonObject = WeatherDataLoader.getJSONData(cityName);
+                final JSONObject jsonObject = WeatherDataLoader.getJSONData(lat, lon);
                 if (jsonObject == null) {
                     handler.post(new Runnable() {
                         @Override
@@ -106,7 +105,7 @@ public class WeatherForecastFragment extends Fragment {
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            renderWeather(jsonObject);
+                            renderWeather(jsonObject, cityName);
                         }
                     });
                 }
@@ -114,13 +113,13 @@ public class WeatherForecastFragment extends Fragment {
         }).start();
     }
 
-    public void renderWeather(JSONObject jsonObject) {
+    private void renderWeather(JSONObject jsonObject, String cityText) {
         constraintLayout.setVisibility(View.VISIBLE);
         try {
             JSONObject details = jsonObject.getJSONArray("weather").getJSONObject(0);
             JSONObject main = jsonObject.getJSONObject("main");
 
-            setPlaceName(jsonObject);
+            cityName.setText(cityText);
             setAll(details, main);
             imageViewToday.setImageResource(setWeatherIcon(details.getInt("id"),
                     jsonObject.getJSONObject("sys").getLong("sunrise") * 1000,
@@ -128,11 +127,6 @@ public class WeatherForecastFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void setPlaceName(JSONObject jsonObject) throws JSONException {
-        String cityText = jsonObject.getString("name");
-        cityName.setText(cityText);
     }
 
     private void setAll(JSONObject details, JSONObject main) throws JSONException {
