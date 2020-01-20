@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
     android:id="@+id/cityCardSP"
     style="@style/Widget.MaterialComponents.CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="4dp"
     android:layout_marginEnd="8dp"
+    android:layout_marginBottom="4dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
-    android:paddingBottom="8dp">
+    android:paddingBottom="8dp"
+    card_view:cardCornerRadius="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +27,8 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/rubik_m"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            card_view:text="Text" />
 
         <TextView
             android:id="@+id/cityAddressSP"
@@ -33,7 +37,8 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:fontFamily="@font/rubik_m"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            card_view:text="Text" />
 
         <com.google.android.gms.maps.MapView
             android:id="@+id/map"
@@ -49,8 +54,8 @@
             android:layout_gravity="end"
             android:text="@string/show"
             android:textSize="14sp"
-            app:icon="@drawable/arrow_down"/>
+            app:icon="@drawable/arrow_down" />
 
     </LinearLayout>
 
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
