@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,28 +13,21 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.mapl.weather_forecast.databases.WeatherForecast;
-import com.mapl.weather_forecast.loaders.WeatherDataLoader;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Date;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class WeatherForecastFragment extends Fragment {
-    private final Handler handler = new Handler();
     private WeatherForecast weatherForecast;
-    private ConstraintLayout constraintLayout;
     private View rootView;
     private Activity activity;
     private ImageView imageViewToday;
-    private TextView cityName, textView;
+    private TextView textViewLocation, textViewDescription, textViewTemp, textViewFeelsLike,
+            textViewTempMin, textViewTempMax, textViewPressure, textViewHumidity;
     private String mainCity;
     private Double mainLat, mainLon;
 
@@ -54,18 +46,21 @@ public class WeatherForecastFragment extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_weather_forecast, container, false);
         initView();
         if (mainCity != null)
-            updateWeatherData(mainCity, mainLat, mainLon);
-        else
-            noData();
+            ((Postman) activity).getCityInfo(mainCity, mainLat, mainLon);
         return rootView;
     }
 
     private void initView() {
         weatherForecast = new WeatherForecast(getContext());
         imageViewToday = rootView.findViewById(R.id.imageViewToday);
-        cityName = rootView.findViewById(R.id.cityNameW);
-        textView = rootView.findViewById(R.id.textWeather);
-        constraintLayout = rootView.findViewById(R.id.weatherConstraintLayout);
+        textViewLocation = rootView.findViewById(R.id.textViewLocation);
+        textViewDescription = rootView.findViewById(R.id.textViewDescription);
+        textViewTemp = rootView.findViewById(R.id.textViewTemp);
+        textViewFeelsLike = rootView.findViewById(R.id.textViewFeelsLike);
+        textViewTempMin = rootView.findViewById(R.id.textViewTempMin);
+        textViewTempMax = rootView.findViewById(R.id.textViewTempMax);
+        textViewPressure = rootView.findViewById(R.id.textViewPressure);
+        textViewHumidity = rootView.findViewById(R.id.textViewHumidity);
 
         initSQLite();
         if (cursor.moveToFirst()) {
@@ -85,65 +80,31 @@ public class WeatherForecastFragment extends Fragment {
                 null, null, null, null, null, null);
     }
 
+    void updateWeatherData(String location, HashMap<String, String> dataDetails, long[] arrayForIcon) {
+        textViewLocation.setText(location);
 
-    void updateWeatherData(final String cityName, final Double lat, final Double lon) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final JSONObject jsonObject = WeatherDataLoader.getJSONData(lat, lon);
-                if (jsonObject == null) {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            CoordinatorLayout coordinatorLayout = activity.findViewById(R.id.coordinatorLayout);
-                            String text = getResources().getString(R.string.weather_data_false);
-                            Snackbar.make(coordinatorLayout, text, Snackbar.LENGTH_LONG).show();
-                            noData();
-                        }
-                    });
-                } else {
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            renderWeather(jsonObject, cityName);
-                        }
-                    });
-                }
-            }
-        }).start();
-    }
+        String description = Objects.requireNonNull(dataDetails.get("description")).toUpperCase();
+        textViewDescription.setText(description);
 
-    private void renderWeather(JSONObject jsonObject, String cityText) {
-        constraintLayout.setVisibility(View.VISIBLE);
-        try {
-            JSONObject details = jsonObject.getJSONArray("weather").getJSONObject(0);
-            JSONObject main = jsonObject.getJSONObject("main");
+        String temp = getResources().getString(R.string.temperature) + ": " + dataDetails.get("temp");
+        textViewTemp.setText(temp);
 
-            cityName.setText(cityText);
-            setAll(details, main);
-            imageViewToday.setImageResource(setWeatherIcon(details.getInt("id"),
-                    jsonObject.getJSONObject("sys").getLong("sunrise") * 1000,
-                    jsonObject.getJSONObject("sys").getLong("sunset") * 1000));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+        String feels_like = getResources().getString(R.string.feels_like) + ": " + dataDetails.get("feels_like");
+        textViewFeelsLike.setText(feels_like);
 
-    private void setAll(JSONObject details, JSONObject main) throws JSONException {
-        String detailsText = details.getString("description").toUpperCase() + "\n"
-                + getResources().getString(R.string.temperature) + ": "
-                + String.format(Locale.getDefault(), "%.2f", main.getDouble("temp")) + "\u2103\n"
-                + getResources().getString(R.string.feels_like) + ": "
-                + String.format(Locale.getDefault(), "%.2f", main.getDouble("feels_like")) + "\u2103\n"
-                + getResources().getString(R.string.temperature_min) + ": "
-                + String.format(Locale.getDefault(), "%.2f", main.getDouble("temp_min")) + "\u2103\n"
-                + getResources().getString(R.string.temperature_max) + ": "
-                + String.format(Locale.getDefault(), "%.2f", main.getDouble("temp_max")) + "\u2103\n"
-                + getResources().getString(R.string.pressure) + ": "
-                + main.getInt("pressure") * 0.75 + "\n"
-                + getResources().getString(R.string.humidity) + ": "
-                + main.getString("humidity") + "%";
-        textView.setText(detailsText);
+        String temp_min = getResources().getString(R.string.temperature_min) + ": " + dataDetails.get("temp_min");
+        textViewTempMin.setText(temp_min);
+
+        String temp_max = getResources().getString(R.string.temperature_max) + ": " + dataDetails.get("temp_max");
+        textViewTempMax.setText(temp_max);
+
+        String pressure = getResources().getString(R.string.pressure) + ": " + dataDetails.get("pressure");
+        textViewPressure.setText(pressure);
+
+        String humidity = getResources().getString(R.string.humidity) + ": " + dataDetails.get("humidity");
+        textViewHumidity.setText(humidity);
+
+        imageViewToday.setImageResource(setWeatherIcon((int) arrayForIcon[0], arrayForIcon[1], arrayForIcon[2]));
     }
 
     private int setWeatherIcon(int actualID, long sunrise, long sunset) {
@@ -205,9 +166,5 @@ public class WeatherForecastFragment extends Fragment {
             }
         }
         return R.drawable.ic_launcher_foreground;
-    }
-
-    private void noData() {
-        constraintLayout.setVisibility(View.GONE);
     }
 }

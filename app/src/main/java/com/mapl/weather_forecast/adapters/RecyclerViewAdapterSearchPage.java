@@ -66,16 +66,15 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
         MapView mapView;
         MaterialButton materialButton;
         OnMapReadyCallback onMapReadyCallback;
-        Boolean check;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            check = false;
             onMapReadyCallback = this;
             cityName = itemView.findViewById(R.id.cityNameSP);
             cityAddress = itemView.findViewById(R.id.cityAddressSP);
             materialButton = itemView.findViewById(R.id.material_icon_button);
             mapView = itemView.findViewById(R.id.map);
+            mapView.onCreate(null);
             materialButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -83,18 +82,12 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
                         mapView.setVisibility(View.VISIBLE);
                         materialButton.setIconResource(R.drawable.arrow_up);
                         if (mapView != null) {
-                            if (!check) {
-                                mapView.onCreate(null);
-                                mapView.getMapAsync(onMapReadyCallback);
-                                check = true;
-                            } else {
-                                mapView.onResume();
-                            }
+                            mapView.getMapAsync(onMapReadyCallback);
                         }
                     } else {
                         mapView.onPause();
-                        materialButton.setIconResource(R.drawable.arrow_down);
                         mapView.setVisibility(View.GONE);
+                        materialButton.setIconResource(R.drawable.arrow_down);
                     }
 
                 }
