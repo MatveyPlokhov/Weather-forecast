@@ -7,35 +7,34 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.mapl.weather_forecast.services.WeatherForecastService;
+
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements Postman {
+    public static final String BROADCAST_ACTION_WEATHER = "com.mapl.weather_forecast.services.weatherdatafinished";
     FragmentManager fragmentManager;
     private CityListFragment cityListFragment;
     private WeatherForecastFragment weatherForecastFragment;
     Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
-    MaterialCardView phoneDataCardView;
 
     FloatingActionButton floatingActionButton;
-
-    Sensor sensorAT, sensorRH;
-    SensorManager sensorManager;
-    TextView textViewAT, textViewRH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +45,21 @@ public class MainActivity extends AppCompatActivity implements Postman {
         initToolbar();
         initNavigationView();
         initView();
+        initNotificationChannel();
         initFragments();
         clickListeners();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        registerReceiver(weatherDataFinishedReceiver, new IntentFilter(BROADCAST_ACTION_WEATHER));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(weatherDataFinishedReceiver);
     }
 
     private void initToolbar() {
@@ -83,21 +95,17 @@ public class MainActivity extends AppCompatActivity implements Postman {
     private void initView() {
         floatingActionButton = findViewById(R.id.fabAddLocation);
         floatingActionButton.setColorFilter(Color.rgb(255, 255, 255));
-        infoPhoneData();
     }
 
-    private void infoPhoneData() {
-        textViewAT = findViewById(R.id.textViewAT);
-        textViewRH = findViewById(R.id.textViewRH);
-        phoneDataCardView = findViewById(R.id.phoneDataCardView);
-        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensorAT = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
-        sensorRH = sensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
-
-        if (sensorAT == null || sensorRH == null)
-            phoneDataCardView.setVisibility(View.GONE);
-        else
-            phoneDataCardView.setVisibility(View.GONE);
+    private void initNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            int importance = NotificationManager.IMPORTANCE_LOW;
+            NotificationChannel notificationChannel = new NotificationChannel("2", "Weather Forecast", importance);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
     }
 
     private void initFragments() {
@@ -106,9 +114,9 @@ public class MainActivity extends AppCompatActivity implements Postman {
         cityListFragment = (CityListFragment) fragmentManager.findFragmentById(R.id.fragmentSelectedListOfCities);
         weatherForecastFragment = (WeatherForecastFragment) fragmentManager.findFragmentById(R.id.fragmentWeatherForecast);
 
-        fragmentManager.beginTransaction()
+        /*fragmentManager.beginTransaction()
                 .hide(weatherForecastFragment)
-                .commit();
+                .commit();*/
     }
 
     private void clickListeners() {
@@ -121,51 +129,17 @@ public class MainActivity extends AppCompatActivity implements Postman {
     }
 
     @Override
-    public void getCityInfo(String cityName, Double lat, Double lon) {
-        weatherForecastFragment.updateWeatherData(cityName, lat, lon);
+    public void getCityInfo(String location, Double lat, Double lon) {
+        WeatherForecastService.startWeatherForecastService(MainActivity.this, location, lat, lon);
     }
 
-    //////////
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        sensorManager.registerListener(listenerAT, sensorAT, SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(listenerRH, sensorRH, SensorManager.SENSOR_DELAY_NORMAL);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sensorManager.unregisterListener(listenerAT, sensorAT);
-        sensorManager.unregisterListener(listenerRH, sensorRH);
-    }
-
-    SensorEventListener listenerAT = new SensorEventListener() {
-
+    private BroadcastReceiver weatherDataFinishedReceiver = new BroadcastReceiver() {
         @Override
-        public void onSensorChanged(SensorEvent event) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append((int)event.values[0]);
-            textViewAT.setText(stringBuilder);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-    };
-
-    final SensorEventListener listenerRH = new SensorEventListener() {
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append((int)event.values[0]);
-            textViewRH.setText(stringBuilder);
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        public void onReceive(Context context, Intent intent) {
+            String location = intent.getStringExtra(WeatherForecastService.EXTRA_RESULT_LOCATION);
+            HashMap<String,String> dataDetails = (HashMap<String, String>)intent.getSerializableExtra(WeatherForecastService.EXTRA_RESULT_HASH_MAP);
+            long[] arrayForIcon = intent.getLongArrayExtra(WeatherForecastService.EXTRA_RESULT_LONG_ARRAY);
+            weatherForecastFragment.updateWeatherData(location, dataDetails, arrayForIcon);
         }
     };
 }

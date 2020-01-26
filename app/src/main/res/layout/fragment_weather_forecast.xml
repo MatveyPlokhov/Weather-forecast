@@ -7,25 +7,23 @@
     style="@style/layoutMM">
 
     <TextView
-        android:id="@+id/cityNameW"
+        android:id="@+id/textViewLocation"
         style="@style/layoutWW"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="City"
         android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText" />
+        tools:text="Location" />
 
     <androidx.cardview.widget.CardView
         style="@style/layoutMW"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        app:cardBackgroundColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cityNameW"
+        app:layout_constraintTop_toBottomOf="@+id/textViewLocation"
         card_view:cardCornerRadius="8dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout style="@style/layoutMW">
@@ -52,15 +50,57 @@
                 app:layout_constraintTop_toBottomOf="@+id/today"
                 tools:ignore="ContentDescription" />
 
-            <TextView
-                android:id="@+id/textWeather"
-                style="@style/layoutWW"
-                android:layout_marginTop="8dp"
-                android:text="Text"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageViewToday"
-                app:layout_constraintTop_toBottomOf="@+id/today"
-                tools:ignore="HardcodedText" />
+                app:layout_constraintTop_toBottomOf="@+id/today">
 
+                <TextView
+                    android:id="@+id/textViewDescription"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="Description" />
+
+                <TextView
+                    android:id="@+id/textViewTemp"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="Temp" />
+
+                <TextView
+                    android:id="@+id/textViewFeelsLike"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="FeelsLike" />
+
+                <TextView
+                    android:id="@+id/textViewTempMin"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="TempMin" />
+
+                <TextView
+                    android:id="@+id/textViewTempMax"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="TempMax" />
+
+                <TextView
+                    android:id="@+id/textViewPressure"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="Pressure" />
+
+                <TextView
+                    android:id="@+id/textViewHumidity"
+                    style="@style/layoutWW"
+                    android:layout_marginTop="8dp"
+                    tools:text="Humidity" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
