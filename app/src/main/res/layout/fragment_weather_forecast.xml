@@ -1,108 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/weatherConstraintLayout"
-    style="@style/layoutMM">
+    android:id="@+id/weatherCardView"
+    style="@style/layoutMW"
+    card_view:cardCornerRadius="8dp">
 
-    <TextView
-        android:id="@+id/textViewLocation"
-        style="@style/layoutWW"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Location" />
+    <FrameLayout style="@style/layoutMM">
 
-    <androidx.cardview.widget.CardView
-        style="@style/layoutMW"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLocation"
-        card_view:cardCornerRadius="8dp">
+        <ImageView
+            android:id="@+id/imageViewBackground"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop"
+            tools:ignore="ContentDescription" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout style="@style/layoutMW">
+        <androidx.constraintlayout.widget.ConstraintLayout style="@style/layoutMM">
+
+            <TextView
+                android:id="@+id/textViewLocation"
+                style="@style/layoutWW"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Location" />
 
             <TextView
                 android:id="@+id/today"
-                style="@style/layoutMW_M88"
+                style="@style/layoutWW"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:fontFamily="@font/roboto"
                 android:gravity="center_horizontal"
                 android:text="@string/today"
                 android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@+id/textViewLocation" />
 
             <ImageView
                 android:id="@+id/imageViewToday"
-                style="@style/layoutWW_M88"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/textViewDescription"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/mist" />
+
+            <TextView
+                android:id="@+id/textViewDescription"
+                style="@style/layoutWW"
+                android:layout_width="0dp"
+                android:layout_marginBottom="16dp"
+                android:textAlignment="center"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/imageViewToday"
+                app:layout_constraintStart_toStartOf="@+id/imageViewToday"
+                tools:text="Description" />
+
+            <TextView
+                android:id="@+id/textViewTemp"
+                style="@style/layoutWW"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/textViewFeelsLike"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/today"
-                tools:ignore="ContentDescription" />
+                tools:text="Temp" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <TextView
+                android:id="@+id/textViewFeelsLike"
+                style="@style/layoutWW"
                 android:layout_marginBottom="8dp"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageViewToday"
-                app:layout_constraintTop_toBottomOf="@+id/today">
+                app:layout_constraintBottom_toTopOf="@+id/textViewHumidity"
+                app:layout_constraintStart_toStartOf="@+id/textViewTemp"
+                tools:text="FeelsLike" />
 
-                <TextView
-                    android:id="@+id/textViewDescription"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="Description" />
+            <TextView
+                android:id="@+id/textViewHumidity"
+                style="@style/layoutWW"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/textViewPressure"
+                app:layout_constraintStart_toStartOf="@+id/textViewFeelsLike"
+                tools:text="Humidity" />
 
-                <TextView
-                    android:id="@+id/textViewTemp"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="Temp" />
+            <TextView
+                android:id="@+id/textViewPressure"
+                style="@style/layoutWW"
+                app:layout_constraintBottom_toBottomOf="@+id/textViewDescription"
+                app:layout_constraintStart_toStartOf="@+id/textViewHumidity"
+                tools:text="Pressure" />
 
-                <TextView
-                    android:id="@+id/textViewFeelsLike"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="FeelsLike" />
-
-                <TextView
-                    android:id="@+id/textViewTempMin"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="TempMin" />
-
-                <TextView
-                    android:id="@+id/textViewTempMax"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="TempMax" />
-
-                <TextView
-                    android:id="@+id/textViewPressure"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="Pressure" />
-
-                <TextView
-                    android:id="@+id/textViewHumidity"
-                    style="@style/layoutWW"
-                    android:layout_marginTop="8dp"
-                    tools:text="Humidity" />
-            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.cardview.widget.CardView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</androidx.cardview.widget.CardView>

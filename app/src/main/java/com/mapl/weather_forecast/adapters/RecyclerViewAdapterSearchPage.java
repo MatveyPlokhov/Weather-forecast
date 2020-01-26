@@ -48,9 +48,10 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
             @Override
             public void onClick(View v) {
                 ((Postman) activity).getCityInfo(
-                        arrayList.get(position).city
-                        , arrayList.get(position).lat
-                        , arrayList.get(position).lon);
+                        arrayList.get(position).city,
+                        arrayList.get(position).lat,
+                        arrayList.get(position).lon
+                );
             }
         });
     }

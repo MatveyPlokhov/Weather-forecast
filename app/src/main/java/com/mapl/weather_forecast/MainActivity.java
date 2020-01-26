@@ -113,10 +113,6 @@ public class MainActivity extends AppCompatActivity implements Postman {
 
         cityListFragment = (CityListFragment) fragmentManager.findFragmentById(R.id.fragmentSelectedListOfCities);
         weatherForecastFragment = (WeatherForecastFragment) fragmentManager.findFragmentById(R.id.fragmentWeatherForecast);
-
-        /*fragmentManager.beginTransaction()
-                .hide(weatherForecastFragment)
-                .commit();*/
     }
 
     private void clickListeners() {
