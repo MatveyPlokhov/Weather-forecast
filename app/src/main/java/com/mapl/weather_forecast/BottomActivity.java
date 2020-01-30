@@ -108,7 +108,7 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
-        if (center != null){
+        if (center != null) {
             googleMap.addMarker(new MarkerOptions().position(center));
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 13f));
         }

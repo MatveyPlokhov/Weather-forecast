@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".CurrentWeatherSingleton"
         android:allowBackup="true"
         android:fullBackupContent="@xml/appcenter_backup_rule"
         android:label="@string/app_name"
@@ -26,7 +27,7 @@
             android:resource="@array/preloaded_fonts" />
 
         <service
-            android:name=".services.WeatherForecastService"
+            android:name=".service.WeatherForecastService"
             android:exported="false" />
 
         <activity

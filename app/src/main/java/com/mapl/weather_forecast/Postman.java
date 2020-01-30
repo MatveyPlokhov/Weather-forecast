@@ -1,5 +1,5 @@
 package com.mapl.weather_forecast;
 
 public interface Postman {
-    void getCityInfo(String cityName, Double lat, Double lon);
+    void getLocationInfo(String cityName, Double lat, Double lon);
 }

@@ -13,36 +13,12 @@
             android:id="@+id/toolbar"
             layout="@layout/toolbar"/>
 
-        <!--<androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>-->
-
-        <LinearLayout
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/mainViewPager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             android:layout_marginTop="?android:actionBarSize"
-            android:layout_marginBottom="56dp"
-            android:layout_gravity="center">
-
-            <fragment
-                android:id="@+id/fragmentSelectedListOfCities"
-                android:name="com.mapl.weather_forecast.CityListFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout="@layout/activity_search" />
-
-            <fragment
-                android:id="@+id/fragmentWeatherForecast"
-                android:name="com.mapl.weather_forecast.WeatherForecastFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                tools:layout="@layout/fragment_weather_forecast" />
-
-        </LinearLayout>
+            android:layout_marginBottom="88dp" />
 
         <include
             android:id="@+id/bottomAppBarCoordinatorLayout"
