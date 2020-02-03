@@ -7,49 +7,44 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <FrameLayout style="@style/layoutMM">
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        style="@style/layoutMM">
 
         <include
             android:id="@+id/toolbar"
-            layout="@layout/toolbar"/>
-
-        <!--<androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewpager"
+            layout="@layout/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>-->
+            android:layout_height="wrap_content"
+            android:layout_gravity="top" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/mainViewPager"
+            style="@style/layoutMM"
             android:layout_marginTop="?android:actionBarSize"
-            android:layout_marginBottom="56dp"
-            android:layout_gravity="center">
+            android:layout_marginBottom="80dp"
+            android:paddingStart="8dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="8dp" />
 
-            <fragment
-                android:id="@+id/fragmentSelectedListOfCities"
-                android:name="com.mapl.weather_forecast.CityListFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:layout="@layout/activity_search" />
-
-            <fragment
-                android:id="@+id/fragmentWeatherForecast"
-                android:name="com.mapl.weather_forecast.WeatherForecastFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                tools:layout="@layout/fragment_weather_forecast" />
-
-        </LinearLayout>
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="?android:actionBarSize"
+            android:hapticFeedbackEnabled="false"
+            app:tabBackground="@drawable/tab_selector"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp" />
 
         <include
             android:id="@+id/bottomAppBarCoordinatorLayout"
             layout="@layout/bottom_bar"
-            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
             android:layout_height="88dp"
-            android:layout_width="match_parent" />
+            android:layout_gravity="bottom" />
     </FrameLayout>
 
     <com.google.android.material.navigation.NavigationView

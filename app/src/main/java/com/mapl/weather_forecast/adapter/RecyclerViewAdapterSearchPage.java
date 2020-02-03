@@ -1,6 +1,8 @@
-package com.mapl.weather_forecast.adapters;
+package com.mapl.weather_forecast.adapter;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +20,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.button.MaterialButton;
 import com.mapl.weather_forecast.Postman;
 import com.mapl.weather_forecast.R;
+import com.mapl.weather_forecast.SearchActivity;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<RecyclerViewAdapterSearchPage.ViewHolder> {
     private ArrayList<CityDataClassSearchPage> arrayList;
@@ -34,26 +39,43 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_city_in_search_page, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_city, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-        String cityInfo = arrayList.get(position).description;
+        String locationInfo = arrayList.get(position).description;
         center = new LatLng(arrayList.get(position).lat, arrayList.get(position).lon);
         holder.cityName.setText(arrayList.get(position).city);
-        holder.cityAddress.setText(cityInfo);
+        holder.cityAddress.setText(locationInfo);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((Postman) activity).getCityInfo(
+                addInHistory(arrayList.get(position).city);
+                ((Postman) activity).getLocationInfo(
                         arrayList.get(position).city,
                         arrayList.get(position).lat,
                         arrayList.get(position).lon
                 );
             }
         });
+    }
+
+    private void addInHistory(String location) {
+        final SharedPreferences preferences = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        Set<String> set = preferences.getStringSet(SearchActivity.KEY_HISTORY, null);
+
+        if (set == null) {
+            set = new LinkedHashSet<>();
+            set.add(location);
+            editor.putStringSet(SearchActivity.KEY_HISTORY, set).apply();
+        } else {
+            set.add(location);
+            preferences.edit().remove(SearchActivity.KEY_HISTORY).apply();
+            editor.putStringSet(SearchActivity.KEY_HISTORY, set).apply();
+        }
     }
 
     @Override

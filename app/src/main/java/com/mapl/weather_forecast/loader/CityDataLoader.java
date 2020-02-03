@@ -1,4 +1,4 @@
-package com.mapl.weather_forecast.loaders;
+package com.mapl.weather_forecast.loader;
 
 import org.json.JSONException;
 import org.json.JSONObject;

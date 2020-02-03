@@ -1,4 +1,4 @@
-package com.mapl.weather_forecast.adapters;
+package com.mapl.weather_forecast.adapter;
 
 public class CityDataClassSearchPage {
     String city, description;

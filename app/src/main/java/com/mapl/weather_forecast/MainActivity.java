@@ -1,19 +1,27 @@
 package com.mapl.weather_forecast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.CompositePageTransformer;
+import androidx.viewpager2.widget.MarginPageTransformer;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -21,32 +29,41 @@ import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-import com.mapl.weather_forecast.services.WeatherForecastService;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
+import com.mapl.weather_forecast.broadcastreceiver.BatteryReceiver;
+import com.mapl.weather_forecast.broadcastreceiver.NetworkReceiver;
+import com.mapl.weather_forecast.dao.CurrentWeatherDao;
+import com.mapl.weather_forecast.service.WeatherForecastService;
 
-import java.util.HashMap;
+import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements Postman {
+public class MainActivity extends AppCompatActivity {
     public static final String BROADCAST_ACTION_WEATHER = "com.mapl.weather_forecast.services.weatherdatafinished";
-    FragmentManager fragmentManager;
-    private CityListFragment cityListFragment;
-    private WeatherForecastFragment weatherForecastFragment;
-    Toolbar toolbar;
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
+    private static final String KEY_POSITION = "KEY_POSITION";
+    private static int RESULT_KEY = 1;
+    private BroadcastReceiver internetReceiver;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
 
     FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppDefaultNavigationView);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initNotificationChannel();
         initToolbar();
         initNavigationView();
         initView();
-        initNotificationChannel();
-        initFragments();
+        setViewPagerAdapter(getPosition());
         clickListeners();
     }
 
@@ -60,6 +77,19 @@ public class MainActivity extends AppCompatActivity implements Postman {
     protected void onStop() {
         super.onStop();
         unregisterReceiver(weatherDataFinishedReceiver);
+        setPosition();
+    }
+
+    private void setPosition() {
+        final SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(KEY_POSITION, viewPager.getCurrentItem());
+        editor.apply();
+    }
+
+    private int getPosition() {
+        final SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        return preferences.getInt(KEY_POSITION, 0);
     }
 
     private void initToolbar() {
@@ -83,16 +113,15 @@ public class MainActivity extends AppCompatActivity implements Postman {
             }
         });
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                MainActivity.this
-                , drawerLayout
-                , toolbar
-                , R.string.open
-                , R.string.close);
+                MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
     private void initView() {
+        viewPager = findViewById(R.id.mainViewPager);
+        tabLayout = findViewById(R.id.tabLayout);
+        tabLayout.setTabRippleColor(null);
         floatingActionButton = findViewById(R.id.fabAddLocation);
         floatingActionButton.setColorFilter(Color.rgb(255, 255, 255));
     }
@@ -106,36 +135,115 @@ public class MainActivity extends AppCompatActivity implements Postman {
                 notificationManager.createNotificationChannel(notificationChannel);
             }
         }
+        initBroadcastReceiver();
     }
 
-    private void initFragments() {
-        fragmentManager = getSupportFragmentManager();
-
-        cityListFragment = (CityListFragment) fragmentManager.findFragmentById(R.id.fragmentSelectedListOfCities);
-        weatherForecastFragment = (WeatherForecastFragment) fragmentManager.findFragmentById(R.id.fragmentWeatherForecast);
+    private void initBroadcastReceiver() {
+        BroadcastReceiver networkReceiver = new NetworkReceiver();
+        BroadcastReceiver batteryReceiver = new BatteryReceiver();
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     private void clickListeners() {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cityListFragment.searchActivityCall();
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivityForResult(intent, RESULT_KEY);
             }
         });
     }
 
     @Override
-    public void getCityInfo(String location, Double lat, Double lon) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RESULT_KEY && resultCode == RESULT_OK) {
+            String location = Objects.requireNonNull(data).getStringExtra(SearchActivity.LOCATION_KEY);
+            Double lat = data.getDoubleExtra(SearchActivity.LAT_KEY, 0);
+            Double lon = data.getDoubleExtra(SearchActivity.LON_KEY, 0);
+
+            getWeatherByLocation(location, lat, lon);
+        }
+    }
+
+    public void getWeatherByLocation(String location, Double lat, Double lon) {
         WeatherForecastService.startWeatherForecastService(MainActivity.this, location, lat, lon);
     }
 
     private BroadcastReceiver weatherDataFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String location = intent.getStringExtra(WeatherForecastService.EXTRA_RESULT_LOCATION);
-            HashMap<String,String> dataDetails = (HashMap<String, String>)intent.getSerializableExtra(WeatherForecastService.EXTRA_RESULT_HASH_MAP);
-            long[] arrayForIcon = intent.getLongArrayExtra(WeatherForecastService.EXTRA_RESULT_LONG_ARRAY);
-            weatherForecastFragment.updateWeatherData(location, dataDetails, arrayForIcon);
+            String result = intent.getStringExtra(WeatherForecastService.EXTRA_RESULT);
+            String message;
+            if (result != null) {
+                if (result.equals(WeatherForecastService.RESULT_OK)) {
+                    setViewPagerAdapter();
+                } else if (result.equals(WeatherForecastService.SERVER_ERROR)) {
+                    message = intent.getStringExtra(WeatherForecastService.EXTRA_MESSAGE);
+                    //Вывожу ошибку
+                } else if (result.equals(WeatherForecastService.CONNECTION_ERROR)) {
+                    //Вывожу ошибку
+                }
+            }
         }
     };
+
+    private void setViewPagerAdapter() {
+        AgentAsyncTask startAdapter = new AgentAsyncTask();
+        startAdapter.execute();
+    }
+
+    private void setViewPagerAdapter(int position) {
+        AgentAsyncTask startAdapter = new AgentAsyncTask();
+        startAdapter.execute(position);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class AgentAsyncTask extends AsyncTask<Integer, Integer, ViewPagerAdapter> {
+        private Integer listSize, position = null;
+
+        @Override
+        protected ViewPagerAdapter doInBackground(Integer... integer) {
+            CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
+            listSize = currentWeatherDao.getWeatherList().size();
+            if (integer.length != 0) position = integer[0];
+            return new ViewPagerAdapter(MainActivity.this, currentWeatherDao.getWeatherList());
+        }
+
+        @Override
+        protected void onPostExecute(ViewPagerAdapter adapter) {
+            setViewPagerPreferences();
+            viewPager.setAdapter(adapter);
+            if (position != null) viewPager.setCurrentItem(position);
+            else viewPager.setCurrentItem(listSize);
+
+            //синхронизирую tabLayout с viewPager
+            new TabLayoutMediator(tabLayout, viewPager,
+                    new TabLayoutMediator.TabConfigurationStrategy() {
+                        @Override
+                        public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+
+                        }
+                    }).attach();
+        }
+    }
+
+    private void setViewPagerPreferences() {
+        CompositePageTransformer transformer = new CompositePageTransformer();
+        transformer.addTransformer(new MarginPageTransformer(40));
+        transformer.addTransformer(new ViewPager2.PageTransformer() {
+            @Override
+            public void transformPage(@NonNull View page, float position) {
+                float r = 1 - Math.abs(position);
+                page.setScaleY(0.85f + r * 0.15f);
+            }
+        });
+        viewPager.setPageTransformer(transformer);
+        viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+        viewPager.setClipToPadding(false);
+        viewPager.setClipChildren(false);
+        viewPager.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
+        viewPager.setOffscreenPageLimit(3);
+    }
 }

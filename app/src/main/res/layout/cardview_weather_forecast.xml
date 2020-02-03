@@ -28,25 +28,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Location" />
 
-            <TextView
-                android:id="@+id/today"
-                style="@style/layoutWW"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto"
-                android:gravity="center_horizontal"
-                android:text="@string/today"
-                android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewLocation" />
-
             <ImageView
-                android:id="@+id/imageViewToday"
+                android:id="@+id/imageViewWeatherToday"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewDescription"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewLocation"
                 tools:ignore="ContentDescription"
                 tools:src="@drawable/mist" />
 
@@ -54,15 +43,14 @@
                 android:id="@+id/textViewDescription"
                 style="@style/layoutWW"
                 android:layout_width="0dp"
-                android:layout_marginBottom="16dp"
                 android:textAlignment="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/imageViewToday"
-                app:layout_constraintStart_toStartOf="@+id/imageViewToday"
+                app:layout_constraintEnd_toEndOf="@+id/imageViewWeatherToday"
+                app:layout_constraintStart_toStartOf="@+id/imageViewWeatherToday"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewWeatherToday"
                 tools:text="Description" />
 
             <TextView
-                android:id="@+id/textViewTemp"
+                android:id="@+id/textViewTemperature"
                 style="@style/layoutWW"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="8dp"
@@ -74,24 +62,24 @@
                 android:id="@+id/textViewFeelsLike"
                 style="@style/layoutWW"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewHumidity"
-                app:layout_constraintStart_toStartOf="@+id/textViewTemp"
-                tools:text="FeelsLike" />
-
-            <TextView
-                android:id="@+id/textViewHumidity"
-                style="@style/layoutWW"
-                android:layout_marginBottom="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/textViewPressure"
-                app:layout_constraintStart_toStartOf="@+id/textViewFeelsLike"
-                tools:text="Humidity" />
+                app:layout_constraintStart_toStartOf="@+id/textViewTemperature"
+                tools:text="FeelsLike" />
 
             <TextView
                 android:id="@+id/textViewPressure"
                 style="@style/layoutWW"
-                app:layout_constraintBottom_toBottomOf="@+id/textViewDescription"
-                app:layout_constraintStart_toStartOf="@+id/textViewHumidity"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toTopOf="@+id/textViewHumidity"
+                app:layout_constraintStart_toStartOf="@+id/textViewFeelsLike"
                 tools:text="Pressure" />
+
+            <TextView
+                android:id="@+id/textViewHumidity"
+                style="@style/layoutWW"
+                app:layout_constraintBottom_toBottomOf="@+id/textViewDescription"
+                app:layout_constraintStart_toStartOf="@+id/textViewPressure"
+                tools:text="Humidity" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
