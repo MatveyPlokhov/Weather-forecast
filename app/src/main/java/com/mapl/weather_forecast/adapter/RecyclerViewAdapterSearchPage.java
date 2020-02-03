@@ -23,7 +23,6 @@ import com.mapl.weather_forecast.R;
 import com.mapl.weather_forecast.SearchActivity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -68,16 +67,15 @@ public class RecyclerViewAdapterSearchPage extends RecyclerView.Adapter<Recycler
         SharedPreferences.Editor editor = preferences.edit();
         Set<String> set = preferences.getStringSet(SearchActivity.KEY_HISTORY, null);
 
-        if(set == null){
+        if (set == null) {
             set = new LinkedHashSet<>();
             set.add(location);
-            editor.putStringSet(SearchActivity.KEY_HISTORY, set);
-        }else {
+            editor.putStringSet(SearchActivity.KEY_HISTORY, set).apply();
+        } else {
             set.add(location);
             preferences.edit().remove(SearchActivity.KEY_HISTORY).apply();
-            editor.putStringSet(SearchActivity.KEY_HISTORY, set);
+            editor.putStringSet(SearchActivity.KEY_HISTORY, set).apply();
         }
-        editor.apply();
     }
 
     @Override

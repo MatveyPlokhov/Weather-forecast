@@ -21,22 +21,11 @@ import java.util.List;
 public class ViewPagerAdapter extends RecyclerView.Adapter<ViewPagerAdapter.ViewHolder> {
     private Activity activity;
     private List<CurrentWeather> list;
-    private Integer position = null;
 
     public ViewPagerAdapter(Activity activity, List<CurrentWeather> list) {
         this.activity = activity;
         if (list != null) {
             this.list = list;
-        } else {
-            this.list = new ArrayList<>();
-        }
-    }
-
-    public ViewPagerAdapter(Activity activity, List<CurrentWeather> list, int position) {
-        this.activity = activity;
-        if (list != null) {
-            this.list = list;
-            this.position = position;
         } else {
             this.list = new ArrayList<>();
         }

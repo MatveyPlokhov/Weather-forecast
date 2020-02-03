@@ -26,6 +26,7 @@ import mumayank.com.airlocationlibrary.AirLocation;
 public class BottomActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private final Handler handler = new Handler();
+    private boolean firstOpen = true;
     private AirLocation airLocation;
     private Activity activity;
     private MapView mapView;
@@ -56,18 +57,6 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
     }
 
     private void create() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mapView.onCreate(null);
-                        mapView.getMapAsync(onMapReadyCallback);
-                    }
-                });
-            }
-        }).start();
     }
 
     private void listeners() {
@@ -119,9 +108,25 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                if (firstOpen) {
+                    firstOpen = false;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mapView.onCreate(null);
+                                    mapView.getMapAsync(onMapReadyCallback);
+                                }
+                            });
+                        }
+                    }).start();
+                } else {
+                    mapView.onResume();
+                }
                 fabLocation.animate().scaleX(1).scaleY(1).setDuration(300).start();
                 fabDone.animate().scaleX(1).scaleY(1).setDuration(300).start();
-                mapView.onResume();
             } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                 fabLocation.animate().scaleX(0).scaleY(0).start();
                 fabDone.animate().scaleX(0).scaleY(0).start();

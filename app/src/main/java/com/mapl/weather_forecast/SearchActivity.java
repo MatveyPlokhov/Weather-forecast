@@ -153,6 +153,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
         intent.putExtra(SearchActivity.LOCATION_KEY, cityName);
         intent.putExtra(SearchActivity.LAT_KEY, lat);
         intent.putExtra(SearchActivity.LON_KEY, lon);
+        //if (bigMapView.isActivated()) bigMapView.onDestroy();
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -160,6 +161,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
     @Override
     public void onBackPressed() {
         setResult(RESULT_CANCELED);
+        //if (bigMapView.isActivated()) bigMapView.onDestroy();
         super.onBackPressed();
         finish();
     }

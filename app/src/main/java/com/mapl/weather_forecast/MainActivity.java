@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,21 +29,26 @@ import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
+import com.mapl.weather_forecast.broadcastreceiver.BatteryReceiver;
+import com.mapl.weather_forecast.broadcastreceiver.NetworkReceiver;
 import com.mapl.weather_forecast.dao.CurrentWeatherDao;
 import com.mapl.weather_forecast.service.WeatherForecastService;
 
-import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     public static final String BROADCAST_ACTION_WEATHER = "com.mapl.weather_forecast.services.weatherdatafinished";
     private static final String KEY_POSITION = "KEY_POSITION";
     private static int RESULT_KEY = 1;
-    Toolbar toolbar;
-    DrawerLayout drawerLayout;
-    NavigationView navigationView;
-    ViewPager2 viewPager;
+    private BroadcastReceiver internetReceiver;
+    private Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
 
     FloatingActionButton floatingActionButton;
 
@@ -114,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         viewPager = findViewById(R.id.mainViewPager);
+        tabLayout = findViewById(R.id.tabLayout);
+        tabLayout.setTabRippleColor(null);
         floatingActionButton = findViewById(R.id.fabAddLocation);
         floatingActionButton.setColorFilter(Color.rgb(255, 255, 255));
     }
@@ -127,6 +135,14 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.createNotificationChannel(notificationChannel);
             }
         }
+        initBroadcastReceiver();
+    }
+
+    private void initBroadcastReceiver() {
+        BroadcastReceiver networkReceiver = new NetworkReceiver();
+        BroadcastReceiver batteryReceiver = new BatteryReceiver();
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     private void clickListeners() {
@@ -147,11 +163,11 @@ public class MainActivity extends AppCompatActivity {
             Double lat = data.getDoubleExtra(SearchActivity.LAT_KEY, 0);
             Double lon = data.getDoubleExtra(SearchActivity.LON_KEY, 0);
 
-            setLocationInDatabase(location, lat, lon);
+            getWeatherByLocation(location, lat, lon);
         }
     }
 
-    public void setLocationInDatabase(String location, Double lat, Double lon) {
+    public void getWeatherByLocation(String location, Double lat, Double lon) {
         WeatherForecastService.startWeatherForecastService(MainActivity.this, location, lat, lon);
     }
 
@@ -201,6 +217,15 @@ public class MainActivity extends AppCompatActivity {
             viewPager.setAdapter(adapter);
             if (position != null) viewPager.setCurrentItem(position);
             else viewPager.setCurrentItem(listSize);
+
+            //синхронизирую tabLayout с viewPager
+            new TabLayoutMediator(tabLayout, viewPager,
+                    new TabLayoutMediator.TabConfigurationStrategy() {
+                        @Override
+                        public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+
+                        }
+                    }).attach();
         }
     }
 
@@ -216,6 +241,8 @@ public class MainActivity extends AppCompatActivity {
         });
         viewPager.setPageTransformer(transformer);
         viewPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
+        viewPager.setClipToPadding(false);
+        viewPager.setClipChildren(false);
         viewPager.getChildAt(0).setOverScrollMode(RecyclerView.OVER_SCROLL_NEVER);
         viewPager.setOffscreenPageLimit(3);
     }

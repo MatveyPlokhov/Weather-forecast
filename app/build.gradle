@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 29
@@ -48,6 +49,8 @@ dependencies {
     //App Center
     implementation 'com.microsoft.appcenter:appcenter-analytics:2.5.1'
     implementation 'com.microsoft.appcenter:appcenter-crashes:2.5.1'
+    //Firebase
+    implementation 'com.google.firebase:firebase-messaging:20.1.0'
     //LeakCanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.1'
 }
