@@ -35,22 +35,24 @@ import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
 import com.mapl.weather_forecast.broadcastreceiver.BatteryReceiver;
 import com.mapl.weather_forecast.broadcastreceiver.NetworkReceiver;
 import com.mapl.weather_forecast.dao.CurrentWeatherDao;
+import com.mapl.weather_forecast.model.CurrentWeather;
 import com.mapl.weather_forecast.service.WeatherForecastService;
 
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     public static final String BROADCAST_ACTION_WEATHER = "com.mapl.weather_forecast.services.weatherdatafinished";
     private static final String KEY_POSITION = "KEY_POSITION";
     private static int RESULT_KEY = 1;
-    private BroadcastReceiver internetReceiver;
+    private boolean runBefore  = false;
+
+    private FloatingActionButton floatingActionButton;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
-
-    FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +65,8 @@ public class MainActivity extends AppCompatActivity {
         initToolbar();
         initNavigationView();
         initView();
-        setViewPagerAdapter(getPosition());
+        setViewPagerAdapter();
+        setWeatherForAllLocations();
         clickListeners();
     }
 
@@ -87,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private int getPosition() {
+    private Integer getPosition() {
         final SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         return preferences.getInt(KEY_POSITION, 0);
     }
@@ -163,12 +166,17 @@ public class MainActivity extends AppCompatActivity {
             Double lat = data.getDoubleExtra(SearchActivity.LAT_KEY, 0);
             Double lon = data.getDoubleExtra(SearchActivity.LON_KEY, 0);
 
-            getWeatherByLocation(location, lat, lon);
+            setWeatherByLocation(location, lat, lon);
         }
     }
 
-    public void getWeatherByLocation(String location, Double lat, Double lon) {
+    public void setWeatherByLocation(String location, Double lat, Double lon) {
         WeatherForecastService.startWeatherForecastService(MainActivity.this, location, lat, lon);
+    }
+
+    public void setWeatherForAllLocations(){
+        runBefore = false;
+        WeatherForecastService.startWeatherForecastService(MainActivity.this);
     }
 
     private BroadcastReceiver weatherDataFinishedReceiver = new BroadcastReceiver() {
@@ -194,29 +202,30 @@ public class MainActivity extends AppCompatActivity {
         startAdapter.execute();
     }
 
-    private void setViewPagerAdapter(int position) {
-        AgentAsyncTask startAdapter = new AgentAsyncTask();
-        startAdapter.execute(position);
-    }
-
     @SuppressLint("StaticFieldLeak")
-    private class AgentAsyncTask extends AsyncTask<Integer, Integer, ViewPagerAdapter> {
-        private Integer listSize, position = null;
+    private class AgentAsyncTask extends AsyncTask<Integer, Integer, List<CurrentWeather>> {
+        private Integer listSize;
 
         @Override
-        protected ViewPagerAdapter doInBackground(Integer... integer) {
+        protected List<CurrentWeather> doInBackground(Integer... integer) {
             CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
             listSize = currentWeatherDao.getWeatherList().size();
-            if (integer.length != 0) position = integer[0];
-            return new ViewPagerAdapter(MainActivity.this, currentWeatherDao.getWeatherList());
+            return currentWeatherDao.getWeatherList();
         }
 
         @Override
-        protected void onPostExecute(ViewPagerAdapter adapter) {
+        protected void onPostExecute(List<CurrentWeather> list) {
+            ViewPagerAdapter adapter = ViewPagerAdapter.getInstance(MainActivity.this, list);
             setViewPagerPreferences();
+            adapter.refreshData(list);
             viewPager.setAdapter(adapter);
-            if (position != null) viewPager.setCurrentItem(position);
-            else viewPager.setCurrentItem(listSize);
+            if (!runBefore) {
+                viewPager.setCurrentItem(getPosition());
+                runBefore = true;
+            }
+            else {
+                viewPager.setCurrentItem(listSize);
+            }
 
             //синхронизирую tabLayout с viewPager
             new TabLayoutMediator(tabLayout, viewPager,

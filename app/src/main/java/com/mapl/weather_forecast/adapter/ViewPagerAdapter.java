@@ -19,16 +19,27 @@ import java.util.Date;
 import java.util.List;
 
 public class ViewPagerAdapter extends RecyclerView.Adapter<ViewPagerAdapter.ViewHolder> {
+    private static ViewPagerAdapter instance;
     private Activity activity;
     private List<CurrentWeather> list;
 
-    public ViewPagerAdapter(Activity activity, List<CurrentWeather> list) {
+    private ViewPagerAdapter(Activity activity, List<CurrentWeather> list) {
         this.activity = activity;
         if (list != null) {
             this.list = list;
         } else {
             this.list = new ArrayList<>();
         }
+    }
+
+    public static ViewPagerAdapter getInstance(Activity activity, List<CurrentWeather> list) {
+        if (instance == null) instance = new ViewPagerAdapter(activity, list);
+        return instance;
+    }
+
+    public void refreshData(List<CurrentWeather> list) {
+        this.list = list;
+        notifyDataSetChanged();
     }
 
     @NonNull

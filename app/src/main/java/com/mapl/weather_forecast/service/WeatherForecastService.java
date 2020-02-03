@@ -20,8 +20,11 @@ import com.mapl.weather_forecast.rest.entities.OpenWeatherMapModel;
 import com.microsoft.appcenter.Flags;
 import com.microsoft.appcenter.analytics.Analytics;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,6 +41,7 @@ public class WeatherForecastService extends IntentService {
     public static String RESULT_OK = "RESULT_OK";
     public static String SERVER_ERROR = "SERVER_ERROR";
     public static String CONNECTION_ERROR = "CONNECTION_ERROR";
+    private static String RESULT_TYPE = "RESULT_TYPE";
 
     private int messageId = 0;
 
@@ -47,31 +51,43 @@ public class WeatherForecastService extends IntentService {
 
     public static void startWeatherForecastService(Context context, String LOCATION, Double LAT, Double LON) {
         Intent intent = new Intent(context, WeatherForecastService.class);
+        intent.putExtra(RESULT_TYPE, "SINGLE");
         intent.putExtra(EXTRA_LOCATION, LOCATION);
         intent.putExtra(EXTRA_LAT, LAT);
         intent.putExtra(EXTRA_LON, LON);
         context.startService(intent);
     }
 
+    public static void startWeatherForecastService(Context context) {
+        Intent intent = new Intent(context, WeatherForecastService.class);
+        intent.putExtra(RESULT_TYPE, "ALL");
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            String location = intent.getStringExtra(EXTRA_LOCATION);
-            Double lat = intent.getDoubleExtra(EXTRA_LAT, 0);
-            Double lon = intent.getDoubleExtra(EXTRA_LON, 0);
-            loadData(location, lat, lon);
+            if (Objects.requireNonNull(intent.getStringExtra(RESULT_TYPE)).equals("SINGLE")) {
+                String location = intent.getStringExtra(EXTRA_LOCATION);
+                Double lat = intent.getDoubleExtra(EXTRA_LAT, 0);
+                Double lon = intent.getDoubleExtra(EXTRA_LON, 0);
+                loadLocationData(location, lat, lon);
+            } else if (Objects.requireNonNull(intent.getStringExtra(RESULT_TYPE)).equals("ALL")) {
+                loadAllData();
+            }
         }
     }
 
-    private void loadData(final String location, final Double lat, final Double lon) {
+    private void loadLocationData(final String location, final Double lat, final Double lon) {
         OpenWeatherMap.getSingleton().getAPI().loadWeather(lat.toString(), lon.toString(),
                 "8b872d9c30ed844f1fa73c7172a8313f", "metric", Locale.getDefault().getLanguage())
                 .enqueue(new Callback<OpenWeatherMapModel>() {
                     @Override
                     public void onResponse(Call<OpenWeatherMapModel> call, Response<OpenWeatherMapModel> response) {
                         if (response.body() != null && response.isSuccessful()) {
-                            WeatherParsing weatherParsing = new WeatherParsing(response.body(),location, lat, lon);
-                            weatherParsing.execute();
+                            AddWeatherInDatabase addWeatherInDatabase = new AddWeatherInDatabase(response.body(),
+                                    location, lat, lon);
+                            addWeatherInDatabase.execute();
                         } else {
                             HashMap<String, String> connectionError = new HashMap<>();
                             connectionError.put("Location", location + " (" + lat + ", " + lon + ")");
@@ -89,6 +105,11 @@ public class WeatherForecastService extends IntentService {
                         sendBroadcast("CONNECTION_ERROR");
                     }
                 });
+    }
+
+    private void loadAllData() {
+        OverwriteWeather overwriteWeather = new OverwriteWeather();
+        overwriteWeather.execute();
     }
 
     private void sendBroadcast(String result) {
@@ -116,12 +137,68 @@ public class WeatherForecastService extends IntentService {
     }
 
     @SuppressLint("StaticFieldLeak")
-    class WeatherParsing extends AsyncTask<View, Integer, View> {
+    class OverwriteWeather extends AsyncTask<Void, Integer, List<CurrentWeather>> {
+        @Override
+        protected List<CurrentWeather> doInBackground(Void... voids) {
+            CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
+            return currentWeatherDao.getWeatherList();
+        }
+
+        @Override
+        protected void onPostExecute(List<CurrentWeather> list) {
+            final List<CurrentWeather> overwriteList = new ArrayList<>();
+            for (final CurrentWeather cWBefore : list) {
+                final CurrentWeather cWAfter = new CurrentWeather();
+                OpenWeatherMap.getSingleton().getAPI().loadWeather(cWBefore.latitude.toString(), cWBefore.longitude.toString(),
+                        "8b872d9c30ed844f1fa73c7172a8313f", "metric", Locale.getDefault().getLanguage())
+                        .enqueue(new Callback<OpenWeatherMapModel>() {
+                            @Override
+                            public void onResponse(Call<OpenWeatherMapModel> call, Response<OpenWeatherMapModel> response) {
+                                if (response.body() != null && response.isSuccessful()) {
+                                    OpenWeatherMapModel model = response.body();
+                                    cWAfter.location = cWBefore.location;
+                                    cWAfter.latitude = cWBefore.latitude;
+                                    cWAfter.longitude = cWBefore.longitude;
+                                    cWAfter.weatherId = model.weather[0].id;
+                                    cWAfter.sunrise = model.sys.sunrise * 1000;
+                                    cWAfter.sunset = model.sys.sunset * 1000;
+                                    cWAfter.description = model.weather[0].description;
+                                    cWAfter.temperature = Math.round(model.main.temp);
+                                    cWAfter.feelsLike = Math.round(model.main.feels_like);
+                                    cWAfter.pressure = model.main.pressure;
+                                    cWAfter.humidity = model.main.humidity;
+                                    overwriteList.add(cWAfter);
+                                } else {
+                                    HashMap<String, String> connectionError = new HashMap<>();
+                                    connectionError.put("Location", cWBefore.location +
+                                            " (" + cWBefore.latitude + ", " + cWBefore.longitude + ")");
+                                    connectionError.put(String.valueOf(response.code()), response.message());
+                                    Analytics.trackEvent("Error in getting weather data",
+                                            connectionError, Flags.CRITICAL);
+                                    sendNotification(response.code() + " " + response.message());
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<OpenWeatherMapModel> call, Throwable t) {
+                                sendNotification(getResources().getString(R.string.weather_data_false));
+                            }
+                        });
+                super.onPostExecute(list);
+            }
+            if (overwriteList.size() == list.size()) {
+
+            }
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    class AddWeatherInDatabase extends AsyncTask<List<CurrentWeather>, Integer, View> {
         private OpenWeatherMapModel model;
         private String location;
         private Double lat, lon;
 
-        WeatherParsing(OpenWeatherMapModel model, String location, Double lat, Double lon) {
+        AddWeatherInDatabase(OpenWeatherMapModel model, String location, Double lat, Double lon) {
             this.model = model;
             this.location = location;
             this.lat = lat;
@@ -129,21 +206,27 @@ public class WeatherForecastService extends IntentService {
         }
 
         @Override
-        protected View doInBackground(View... views) {
+        protected View doInBackground(List<CurrentWeather>... lists) {
             CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
-            CurrentWeather currentWeather = new CurrentWeather();
-            currentWeather.location = location;
-            currentWeather.latitude = lat;
-            currentWeather.longitude = lon;
-            currentWeather.weatherId = model.weather[0].id;
-            currentWeather.sunrise = model.sys.sunrise * 1000;
-            currentWeather.sunset = model.sys.sunset * 1000;
-            currentWeather.description = model.weather[0].description;
-            currentWeather.temperature = Math.round(model.main.temp);
-            currentWeather.feelsLike = Math.round(model.main.feels_like);
-            currentWeather.pressure = model.main.pressure;
-            currentWeather.humidity = model.main.humidity;
-            currentWeatherDao.insertCurrentWeather(currentWeather);
+            if (lists.length != 0) {
+                for (CurrentWeather currentWeather : lists[0]) {
+                    currentWeatherDao.insertCurrentWeather(currentWeather);
+                }
+            } else {
+                CurrentWeather currentWeather = new CurrentWeather();
+                currentWeather.location = location;
+                currentWeather.latitude = lat;
+                currentWeather.longitude = lon;
+                currentWeather.weatherId = model.weather[0].id;
+                currentWeather.sunrise = model.sys.sunrise * 1000;
+                currentWeather.sunset = model.sys.sunset * 1000;
+                currentWeather.description = model.weather[0].description;
+                currentWeather.temperature = Math.round(model.main.temp);
+                currentWeather.feelsLike = Math.round(model.main.feels_like);
+                currentWeather.pressure = model.main.pressure;
+                currentWeather.humidity = model.main.humidity;
+                currentWeatherDao.insertCurrentWeather(currentWeather);
+            }
             return null;
         }
 
