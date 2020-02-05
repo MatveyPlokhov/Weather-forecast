@@ -1,13 +1,15 @@
-package com.mapl.weather_forecast.model;
+package com.mapl.weather_forecast.database.model;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(indices = {@Index(value = {CurrentWeather.LAT, CurrentWeather.LON}, unique = true)})
 
-public class CurrentWeather {
+public class CurrentWeather implements Serializable {
 
     public final static String ID = "id";
     public final static String LOCATION = "location";

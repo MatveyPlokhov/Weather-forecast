@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mapl.weather_forecast.R;
-import com.mapl.weather_forecast.model.CurrentWeather;
+import com.mapl.weather_forecast.database.model.CurrentWeather;
 
 import java.util.ArrayList;
 import java.util.Date;
