@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.mapl.weather_forecast">
 
-    <uses-permission android:name=" android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name=" android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name=" android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name=" android.permission.CHANGE_WIFI_STATE" />
@@ -12,6 +11,7 @@
         android:name=".database.CurrentWeatherSingleton"
         android:allowBackup="true"
         android:fullBackupContent="@xml/appcenter_backup_rule"
+        android:icon="@drawable/ic_launcher_foreground"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -29,23 +29,13 @@
         <service
             android:name=".service.WeatherForecastService"
             android:exported="false" />
-
         <service
             android:name=".service.PushNotificationsService"
-            android:enabled="true"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
-        <receiver
-            android:name=".broadcastreceiver.NetworkReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".SplashActivity"
@@ -65,6 +55,9 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".LocationWeatherActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".BottomActivity"
             android:screenOrientation="portrait" />

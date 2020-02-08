@@ -29,7 +29,10 @@ public interface CurrentWeatherDao {
     void deteleCurrentWeatherById(long id);
 
     @Query("SELECT * FROM CurrentWeather")
-    Single<List<CurrentWeather>> getWeatherList();
+    Single<List<CurrentWeather>> getWeatherListSingle();
+
+    @Query("SELECT * FROM CurrentWeather")
+    List<CurrentWeather> getWeatherList();
 
     @Query("SELECT * FROM CurrentWeather WHERE id = :id")
     CurrentWeather getCurrentWeatherById(long id);

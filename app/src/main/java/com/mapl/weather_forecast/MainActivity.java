@@ -19,20 +19,17 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
-import com.mapl.weather_forecast.broadcastreceiver.BatteryReceiver;
-import com.mapl.weather_forecast.broadcastreceiver.NetworkReceiver;
 import com.mapl.weather_forecast.database.CurrentWeatherSingleton;
 import com.mapl.weather_forecast.database.dao.CurrentWeatherDao;
 import com.mapl.weather_forecast.database.model.CurrentWeather;
@@ -55,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton floatingActionButton;
     private Toolbar toolbar;
+    private BottomAppBar bottomAppBar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ViewPager2 viewPager;
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initNotificationChannel();
-        initToolbar();
+        initBar();
         initNavigationView();
         initView();
         setWeatherForAllLocations();
@@ -77,14 +75,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
         registerReceiver(weatherDataFinishedReceiver, new IntentFilter(BROADCAST_ACTION_WEATHER));
+        super.onStart();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        //unregisterReceiver(weatherDataFinishedReceiver);
+        unregisterReceiver(weatherDataFinishedReceiver);
         setPosition();
     }
 
@@ -100,8 +98,9 @@ public class MainActivity extends AppCompatActivity {
         return preferences.getInt(KEY_POSITION, 0);
     }
 
-    private void initToolbar() {
+    private void initBar() {
         toolbar = findViewById(R.id.toolbar);
+        bottomAppBar = findViewById(R.id.bottom_app_bar);
         setSupportActionBar(toolbar);
     }
 
@@ -113,15 +112,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.settingsItem:
-                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivity(intent);
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        break;
+                    case R.id.weatherNearMe:
+                        startActivity(new Intent(MainActivity.this, LocationWeatherActivity.class));
                         break;
                 }
                 return true;
             }
         });
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
+                MainActivity.this, drawerLayout, bottomAppBar, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
@@ -143,14 +144,6 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.createNotificationChannel(notificationChannel);
             }
         }
-        initBroadcastReceiver();
-    }
-
-    private void initBroadcastReceiver() {
-        BroadcastReceiver networkReceiver = new NetworkReceiver();
-        BroadcastReceiver batteryReceiver = new BatteryReceiver();
-        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     private void clickListeners() {
@@ -175,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setWeatherByLocation(final String location, final Double lat, final Double lon) {
-        currentWeatherDao.getWeatherList()
+    private void setWeatherByLocation(final String location, final Double lat, final Double lon) {
+        currentWeatherDao.getWeatherListSingle()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
@@ -197,8 +190,8 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    public void setWeatherForAllLocations() {
-        currentWeatherDao.getWeatherList()
+    private void setWeatherForAllLocations() {
+        currentWeatherDao.getWeatherListSingle()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
@@ -230,18 +223,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void setViewPagerAdapter(List<CurrentWeather> list) {
+    private void setViewPagerAdapter(final List<CurrentWeather> list) {
         ViewPagerAdapter adapter = ViewPagerAdapter.getInstance(MainActivity.this, list);
         setViewPagerPreferences();
         adapter.refreshData(list);
         viewPager.setAdapter(adapter);
         if (notRunBefore) {
             notRunBefore = false;
-            viewPager.setCurrentItem(getPosition());
+            viewPager.setCurrentItem(getPosition(), false);
         } else {
-            viewPager.setCurrentItem(list.size());
+            viewPager.setCurrentItem(list.size(), false);
         }
-
         //синхронизирую tabLayout с viewPager
         new TabLayoutMediator(tabLayout, viewPager,
                 new TabLayoutMediator.TabConfigurationStrategy() {

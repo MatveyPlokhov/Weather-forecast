@@ -1,10 +1,10 @@
 package com.mapl.weather_forecast.service;
 
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.Context;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -60,6 +60,7 @@ public class WeatherForecastService extends IntentService {
         }
     }
 
+    @SuppressLint("CheckResult")
     private void loadLocationData(final List<CurrentWeather> list) {
         CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
         boolean clientError = false, serverError = false;
@@ -99,17 +100,17 @@ public class WeatherForecastService extends IntentService {
         }
 
         if (!serverError && !clientError) {
-            Observable.fromCallable(new CallableAddInDatabase(list,currentWeatherDao))
+            Observable.fromCallable(new CallableAddInDatabase(list, currentWeatherDao))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Consumer<List<CurrentWeather>>() {
                         @Override
-                        public void accept(final List<CurrentWeather> list) throws Exception {
+                        public void accept(final List<CurrentWeather> list) {
                             sendBroadcast("RESULT_OK", list);
                         }
                     });
         } else {
-            currentWeatherDao.getWeatherList()
+            currentWeatherDao.getWeatherListSingle()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
@@ -127,20 +128,20 @@ public class WeatherForecastService extends IntentService {
     }
 
     class CallableAddInDatabase implements Callable<List<CurrentWeather>> {
-        private final List<CurrentWeather> list;
         private final CurrentWeatherDao currentWeatherDao;
+        private final List<CurrentWeather> list;
 
-        public CallableAddInDatabase(List<CurrentWeather> list, CurrentWeatherDao currentWeatherDao) {
+        CallableAddInDatabase(List<CurrentWeather> list, CurrentWeatherDao currentWeatherDao) {
             this.list = list;
             this.currentWeatherDao = currentWeatherDao;
         }
 
         @Override
-        public List<CurrentWeather> call() throws Exception {
+        public List<CurrentWeather> call() {
             for (CurrentWeather currentWeather : list) {
                 currentWeatherDao.insertCurrentWeather(currentWeather);
             }
-            return list;
+            return currentWeatherDao.getWeatherList();
         }
     }
 

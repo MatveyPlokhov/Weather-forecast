@@ -26,6 +26,7 @@
     <string name="person">person</string>
     <string name="open" translatable="false">Open</string>
     <string name="close" translatable="false">Close</string>
+    <string name="weather_near_me">Weather near me</string>
 
     <!-- Preference Titles -->
     <string name="messages_header" translatable="false">Messages</string>
@@ -38,7 +39,6 @@
     <!-- Sync Preferences -->
     <string name="sync_title" translatable="false">Sync email periodically</string>
     <string name="attachment_title" translatable="false">Download incoming attachments</string>
-    <string name="attachment_summary_on" translatable="false">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="attachment_summary_on" translatable="false">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off" translatable="false">Only download attachments when manually requested</string>
 </resources>

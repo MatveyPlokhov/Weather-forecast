@@ -18,4 +18,5 @@
     <string name="about_weather_forecast">О WeatherForecast</string>
     <string name="add_new_location">Новое местоположение</string>
     <string name="person">Пользователь</string>
+    <string name="weather_near_me">Погода рядом со мной</string>
 </resources>
