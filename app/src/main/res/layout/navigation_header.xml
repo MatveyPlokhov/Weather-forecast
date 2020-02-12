@@ -16,6 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/person"
-        app:srcCompat="@drawable/clear_sky_n" />
+        app:srcCompat="@drawable/ic_weather_clear_night" />
 
 </LinearLayout>

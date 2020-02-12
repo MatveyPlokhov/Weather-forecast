@@ -1,44 +1,20 @@
 <resources>
     <string name="app_name" translatable="false">Weather forecast</string>
-    <string name="today">Today</string>
-    <string name="tomorrow">Tomorrow</string>
-    <string name="day">Day</string>
-    <string name="night">Night</string>
     <string name="search">Search</string>
-    <string name="snackbarInfo">The city is added to the list</string>
-    <string name="ok" translatable="false">OK</string>
     <string name="weather_data_false">Data cannot be updated</string>
     <string name="temperature">Temperature</string>
     <string name="feels_like">Feels like</string>
-    <string name="temperature_min">Temperature min</string>
-    <string name="temperature_max">Temperature max</string>
     <string name="pressure">Pressure</string>
     <string name="humidity">Humidity</string>
     <string name="show" translatable="false">SHOW</string>
     <string name="microphone" translatable="false">microphone</string>
-    <string name="remove" translatable="false">remove</string>
     <string name="location" translatable="false">location</string>
-    <string name="locations">Locations</string>
-    <string name="settings">Settings</string>
     <string name="help_feedback"><![CDATA[Help & feedback]]></string>
     <string name="about_weather_forecast">About WeatherForecast</string>
-    <string name="add_new_location">New location</string>
     <string name="person">person</string>
     <string name="open" translatable="false">Open</string>
     <string name="close" translatable="false">Close</string>
     <string name="weather_near_me">Weather near me</string>
-
-    <!-- Preference Titles -->
-    <string name="messages_header" translatable="false">Messages</string>
-    <string name="sync_header" translatable="false">Sync</string>
-
-    <!-- Messages Preferences -->
-    <string name="signature_title" translatable="false">Your signature</string>
-    <string name="reply_title" translatable="false">Default reply action</string>
-
-    <!-- Sync Preferences -->
-    <string name="sync_title" translatable="false">Sync email periodically</string>
-    <string name="attachment_title" translatable="false">Download incoming attachments</string>
-    <string name="attachment_summary_on" translatable="false">Automatically download attachments for incoming emails</string>
-    <string name="attachment_summary_off" translatable="false">Only download attachments when manually requested</string>
+    <string name="selected_locations">Selected locations</string>
+    <string name="dark_mode">Dark mode</string>
 </resources>

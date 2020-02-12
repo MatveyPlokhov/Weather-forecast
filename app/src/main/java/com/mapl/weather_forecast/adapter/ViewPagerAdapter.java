@@ -52,7 +52,6 @@ public class ViewPagerAdapter extends RecyclerView.Adapter<ViewPagerAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.location.setText(list.get(position).location);
         holder.description.setText(list.get(position).description);
         String temperature = activity.getResources().getString(R.string.temperature) + ": " + list.get(position).temperature;
         holder.temperature.setText(temperature);
@@ -62,69 +61,122 @@ public class ViewPagerAdapter extends RecyclerView.Adapter<ViewPagerAdapter.View
         holder.pressure.setText(pressure);
         String humidity = activity.getResources().getString(R.string.humidity) + ": " + list.get(position).humidity;
         holder.humidity.setText(humidity);
-        holder.today.setImageResource(setWeatherImage(position));
+        setWeatherImage(position, holder.todayIcon, holder.backgroundView);
     }
 
-    private int setWeatherImage(int i) {
-        int fullId = (int) list.get(i).weatherId;
-        int id = fullId / 100;
+    private void setWeatherImage(int i, ImageView todayIcon, View background) {
+        int id = (int) list.get(i).weatherId;
+        Integer iconId = null, gradient = null;
         long currentTime = new Date().getTime();
         if (currentTime >= list.get(i).sunrise && currentTime < list.get(i).sunset) {
-            switch (id) {
-                case (2):
-                    return R.drawable.thunderstorm;
-                case (3):
-                    return R.drawable.shower_rain;
-                case (5):
-                    if (fullId >= 500 && fullId <= 504)
-                        return R.drawable.rain_d;
-                    else if (fullId == 511)
-                        return R.drawable.snow;
-                    else
-                        return R.drawable.shower_rain;
-                case (6):
-                    return R.drawable.snow;
-                case (7):
-                    return R.drawable.mist;
-                case (8):
-                    if (fullId == 800)
-                        return R.drawable.clear_sky_d;
-                    else if (fullId == 801)
-                        return R.drawable.few_clouds_d;
-                    else if (fullId == 802)
-                        return R.drawable.scattered_clouds;
-                    else if (fullId == 803 || fullId == 804)
-                        return R.drawable.broken_clouds;
+            if (id >= 200 && id <= 232) {
+                if (id <= 202) iconId = R.drawable.ic_weather_mix_rainfall;
+                if (id == 210 || id == 211) iconId = R.drawable.ic_weather_scattered_thunderstorm;
+                if (id == 212 || id == 221) iconId = R.drawable.ic_weather_severe_thunderstorm;
+                if (id >= 230) iconId = R.drawable.ic_weather_mix_rainfall;
+                gradient = R.drawable.gr_thunderstorm;
+            } else if (id >= 300 && id <= 321) {
+                if (id == 300) iconId = R.drawable.ic_weather_scattered_showers;
+                if (id == 301) iconId = R.drawable.ic_weather_drizzle;
+                if (id == 302) iconId = R.drawable.ic_weather_rain;
+                if (id == 310 || id == 311) iconId = R.drawable.ic_weather_drizzle;
+                if (id == 312 || id == 313) iconId = R.drawable.ic_weather_rain;
+                if (id == 314 || id == 321) iconId = R.drawable.ic_weather_heavy_rain;
+                gradient = R.drawable.gr_clouds;
+            } else if (id >= 500 && id <= 531) {
+                if (id == 500) iconId = R.drawable.ic_weather_scattered_showers;
+                if (id == 501) iconId = R.drawable.ic_weather_drizzle;
+                if (id == 502 || id == 503) iconId = R.drawable.ic_weather_rain;
+                if (id == 504) iconId = R.drawable.ic_weather_heavy_rain;
+                if (id == 511) iconId = R.drawable.ic_weather_sleet;
+                if (id == 520 || id == 521) iconId = R.drawable.ic_weather_rain;
+                if (id == 522 || id == 531) iconId = R.drawable.ic_weather_heavy_rain;
+                gradient = R.drawable.gr_clouds;
+            } else if (id >= 600 && id <= 622) {
+                if (id <= 602) iconId = R.drawable.ic_weather_snow;
+                if (id >= 611 && id <= 616) iconId = R.drawable.ic_weather_sleet;
+                if (id == 620 || id == 621) iconId = R.drawable.ic_weather_snow;
+                if (id == 622) iconId = R.drawable.ic_weather_blizzard;
+                gradient = R.drawable.gr_snow;
+            } else if (id >= 701 && id <= 781) {
+                if (id == 701) iconId = R.drawable.ic_weather_fog;
+                if (id == 711) iconId = R.drawable.ic_weather_smoke;
+                if (id == 721) iconId = R.drawable.ic_weather_haze;
+                if (id == 731) iconId = R.drawable.ic_weather_dust;
+                if (id == 741) iconId = R.drawable.ic_weather_fog;
+                if (id == 751 || id == 761) iconId = R.drawable.ic_weather_dust;
+                if (id == 762) iconId = R.drawable.ic_weather_smoke;
+                if (id == 771) iconId = R.drawable.ic_weather_breezy;
+                if (id == 781) iconId = R.drawable.ic_weather_tornado;
+                gradient = R.drawable.gr_clouds;
+            } else if (id == 800) {
+                iconId = R.drawable.ic_weather_mostly_sunny;
+                gradient = R.drawable.gr_clear;
+            } else if (id >= 801 && id <= 804) {
+                if (id == 801) iconId = R.drawable.ic_weather_party_cloudy;
+                if (id == 802) iconId = R.drawable.ic_weather_mostly_cloudy;
+                if (id == 803) iconId = R.drawable.ic_weather_mostly_cloudy;
+                if (id == 804) iconId = R.drawable.ic_weather_smoke;
+                gradient = R.drawable.gr_clouds;
             }
         } else {
-            switch (id) {
-                case (2):
-                    return R.drawable.thunderstorm;
-                case (3):
-                    return R.drawable.shower_rain;
-                case (5):
-                    if (fullId >= 500 && fullId <= 504)
-                        return R.drawable.rain_n;
-                    else if (fullId == 511)
-                        return R.drawable.snow;
-                    else
-                        return R.drawable.shower_rain;
-                case (6):
-                    return R.drawable.snow;
-                case (7):
-                    return R.drawable.mist;
-                case (8):
-                    if (fullId == 800)
-                        return R.drawable.clear_sky_n;
-                    else if (fullId == 801)
-                        return R.drawable.few_clouds_n;
-                    else if (fullId == 802)
-                        return R.drawable.scattered_clouds;
-                    else if (fullId == 803 || fullId == 804)
-                        return R.drawable.broken_clouds;
+            if (id >= 200 && id <= 232) {
+                if (id <= 202) iconId = R.drawable.ic_weather_mix_rainfall_night;
+                if (id == 210 || id == 211)
+                    iconId = R.drawable.ic_weather_scattered_thunderstorm_night;
+                if (id == 212 || id == 221)
+                    iconId = R.drawable.ic_weather_severe_thunderstorm_night;
+                if (id >= 230) iconId = R.drawable.ic_weather_mix_rainfall_night;
+                gradient = R.drawable.gr_thunderstorm;
+            } else if (id >= 300 && id <= 321) {
+                if (id == 300) iconId = R.drawable.ic_weather_scattered_showers_night;
+                if (id == 301) iconId = R.drawable.ic_weather_drizzle_night;
+                if (id == 302) iconId = R.drawable.ic_weather_rain_nght;
+                if (id == 310 || id == 311) iconId = R.drawable.ic_weather_drizzle_night;
+                if (id == 312 || id == 313) iconId = R.drawable.ic_weather_rain_nght;
+                if (id == 314 || id == 321) iconId = R.drawable.ic_weather_heavy_rain_night;
+                gradient = R.drawable.gr_clouds;
+            } else if (id >= 500 && id <= 531) {
+                if (id == 500) iconId = R.drawable.ic_weather_scattered_showers_night;
+                if (id == 501) iconId = R.drawable.ic_weather_drizzle_night;
+                if (id == 502 || id == 503) iconId = R.drawable.ic_weather_rain_nght;
+                if (id == 504) iconId = R.drawable.ic_weather_heavy_rain_night;
+                if (id == 511) iconId = R.drawable.ic_weather_sleet_night;
+                if (id == 520 || id == 521) iconId = R.drawable.ic_weather_rain_nght;
+                if (id == 522 || id == 531) iconId = R.drawable.ic_weather_heavy_rain_night;
+                gradient = R.drawable.gr_clouds;
+            } else if (id >= 600 && id <= 622) {
+                if (id <= 602) iconId = R.drawable.ic_weather_snow_night;
+                if (id >= 611 && id <= 616) iconId = R.drawable.ic_weather_sleet_night;
+                if (id == 620 || id == 621) iconId = R.drawable.ic_weather_snow_night;
+                if (id == 622) iconId = R.drawable.ic_weather_blizzard_night;
+                gradient = R.drawable.gr_snow;
+            } else if (id >= 701 && id <= 781) {
+                if (id == 701) iconId = R.drawable.ic_weather_fog_night;
+                if (id == 711) iconId = R.drawable.ic_weather_smoke;
+                if (id >= 721 && id <= 761) iconId = R.drawable.ic_weather_fog_night;
+                if (id == 762) iconId = R.drawable.ic_weather_smoke;
+                if (id == 771) iconId = R.drawable.ic_weather_breezy;
+                if (id == 781) iconId = R.drawable.ic_weather_tornado;
+                gradient = R.drawable.gr_clouds;
+            } else if (id == 800) {
+                iconId = R.drawable.ic_weather_clear_night;
+                gradient = R.drawable.gr_clear;
+            } else if (id >= 801 && id <= 804) {
+                if (id == 801) iconId = R.drawable.ic_weather_party_cloudy_night;
+                if (id == 802) iconId = R.drawable.ic_weather_mostly_cloudy_night;
+                if (id == 803) iconId = R.drawable.ic_weather_mostly_cloudy;
+                if (id == 804) iconId = R.drawable.ic_weather_smoke;
+                gradient = R.drawable.gr_clouds;
             }
         }
-        return R.drawable.ic_launcher_foreground;
+        if (iconId != null) {
+            todayIcon.setImageResource(iconId);
+            background.setBackgroundResource(gradient);
+        } else {
+            todayIcon.setImageResource(R.drawable.ic_error);
+            background.setBackgroundResource(R.drawable.gr_thunderstorm);
+        }
     }
 
     @Override
@@ -133,19 +185,19 @@ public class ViewPagerAdapter extends RecyclerView.Adapter<ViewPagerAdapter.View
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView background, today;
-        TextView location, description, temperature, feelsLike, humidity, pressure;
+        ImageView todayIcon;
+        View backgroundView;
+        TextView description, temperature, feelsLike, humidity, pressure;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            background = itemView.findViewById(R.id.imageViewBackground);
-            today = itemView.findViewById(R.id.imageViewWeatherToday);
-            location = itemView.findViewById(R.id.textViewLocation);
+            todayIcon = itemView.findViewById(R.id.imageViewWeatherToday);
             description = itemView.findViewById(R.id.textViewDescription);
             temperature = itemView.findViewById(R.id.textViewTemperature);
             feelsLike = itemView.findViewById(R.id.textViewFeelsLike);
             pressure = itemView.findViewById(R.id.textViewPressure);
             humidity = itemView.findViewById(R.id.textViewHumidity);
+            backgroundView = itemView.findViewById(R.id.backgroundView);
         }
     }
 }

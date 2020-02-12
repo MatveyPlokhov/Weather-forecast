@@ -57,8 +57,6 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         topBar = activity.findViewById(R.id.topBar);
         location = activity.findViewById(R.id.locationImage);
 
-        fabLocation.setColorFilter(Color.rgb(255, 255, 255));
-        fabDone.setColorFilter(Color.rgb(255, 255, 255));
         fabLocation.animate().scaleX(0).scaleY(0).start();
         fabDone.animate().scaleX(0).scaleY(0).start();
     }

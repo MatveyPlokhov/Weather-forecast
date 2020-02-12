@@ -7,26 +7,16 @@
     style="@style/layoutMW"
     card_view:cardCornerRadius="8dp">
 
-    <FrameLayout style="@style/layoutMM">
+    <View
+        android:id="@+id/backgroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/imageViewBackground"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:scaleType="centerCrop"
-            tools:ignore="ContentDescription" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout style="@style/layoutMM">
-
-            <TextView
-                android:id="@+id/textViewLocation"
-                style="@style/layoutWW"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Location" />
 
             <ImageView
                 android:id="@+id/imageViewWeatherToday"
@@ -35,9 +25,9 @@
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewLocation"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription"
-                tools:src="@drawable/mist" />
+                tools:src="@drawable/ic_weather_clear_night" />
 
             <TextView
                 android:id="@+id/textViewDescription"
