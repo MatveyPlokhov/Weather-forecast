@@ -9,10 +9,10 @@
     </group>
 
     <item
-        android:id="@+id/addLocationItem"
+        android:id="@+id/weatherNearMe"
         android:gravity="center_horizontal"
-        android:icon="@drawable/add"
-        android:title="@string/add_new_location" />
+        android:icon="@drawable/ic_location"
+        android:title="@string/weather_near_me" />
 
     <group android:id="@+id/group_preferences">
         <item

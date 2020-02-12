@@ -11,7 +11,6 @@ import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
@@ -20,37 +19,44 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
-import com.mapl.weather_forecast.broadcastreceiver.BatteryReceiver;
-import com.mapl.weather_forecast.broadcastreceiver.NetworkReceiver;
-import com.mapl.weather_forecast.dao.CurrentWeatherDao;
+import com.mapl.weather_forecast.database.CurrentWeatherSingleton;
+import com.mapl.weather_forecast.database.dao.CurrentWeatherDao;
+import com.mapl.weather_forecast.database.model.CurrentWeather;
 import com.mapl.weather_forecast.service.WeatherForecastService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+
 public class MainActivity extends AppCompatActivity {
+    private final CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
     public static final String BROADCAST_ACTION_WEATHER = "com.mapl.weather_forecast.services.weatherdatafinished";
     private static final String KEY_POSITION = "KEY_POSITION";
     private static int RESULT_KEY = 1;
-    private BroadcastReceiver internetReceiver;
+    private boolean notRunBefore = true;
+
+    private FloatingActionButton floatingActionButton;
     private Toolbar toolbar;
+    private BottomAppBar bottomAppBar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
-
-    FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,17 +66,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initNotificationChannel();
-        initToolbar();
+        initBar();
         initNavigationView();
         initView();
-        setViewPagerAdapter(getPosition());
+        setWeatherForAllLocations();
         clickListeners();
     }
 
     @Override
     protected void onStart() {
-        super.onStart();
         registerReceiver(weatherDataFinishedReceiver, new IntentFilter(BROADCAST_ACTION_WEATHER));
+        super.onStart();
     }
 
     @Override
@@ -87,13 +93,14 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    private int getPosition() {
+    private Integer getPosition() {
         final SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
         return preferences.getInt(KEY_POSITION, 0);
     }
 
-    private void initToolbar() {
+    private void initBar() {
         toolbar = findViewById(R.id.toolbar);
+        bottomAppBar = findViewById(R.id.bottom_app_bar);
         setSupportActionBar(toolbar);
     }
 
@@ -105,15 +112,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
                     case R.id.settingsItem:
-                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                        startActivity(intent);
+                        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                        break;
+                    case R.id.weatherNearMe:
+                        startActivity(new Intent(MainActivity.this, LocationWeatherActivity.class));
                         break;
                 }
                 return true;
             }
         });
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                MainActivity.this, drawerLayout, toolbar, R.string.open, R.string.close);
+                MainActivity.this, drawerLayout, bottomAppBar, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
@@ -135,14 +144,6 @@ public class MainActivity extends AppCompatActivity {
                 notificationManager.createNotificationChannel(notificationChannel);
             }
         }
-        initBroadcastReceiver();
-    }
-
-    private void initBroadcastReceiver() {
-        BroadcastReceiver networkReceiver = new NetworkReceiver();
-        BroadcastReceiver batteryReceiver = new BatteryReceiver();
-        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-        registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
     private void clickListeners() {
@@ -163,70 +164,83 @@ public class MainActivity extends AppCompatActivity {
             Double lat = data.getDoubleExtra(SearchActivity.LAT_KEY, 0);
             Double lon = data.getDoubleExtra(SearchActivity.LON_KEY, 0);
 
-            getWeatherByLocation(location, lat, lon);
+            setWeatherByLocation(location, lat, lon);
         }
     }
 
-    public void getWeatherByLocation(String location, Double lat, Double lon) {
-        WeatherForecastService.startWeatherForecastService(MainActivity.this, location, lat, lon);
+    private void setWeatherByLocation(final String location, final Double lat, final Double lon) {
+        currentWeatherDao.getWeatherListSingle()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
+                    @Override
+                    public void onSuccess(List<CurrentWeather> list) {
+                        CurrentWeather currentWeather = new CurrentWeather();
+                        currentWeather.location = location;
+                        currentWeather.latitude = lat;
+                        currentWeather.longitude = lon;
+                        list.add(currentWeather);
+                        WeatherForecastService.startWeatherForecastService(MainActivity.this, list);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        WeatherForecastService.startWeatherForecastService(MainActivity.this, new ArrayList<CurrentWeather>());
+                    }
+                });
+    }
+
+    private void setWeatherForAllLocations() {
+        currentWeatherDao.getWeatherListSingle()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
+                    @Override
+                    public void onSuccess(List<CurrentWeather> list) {
+                        WeatherForecastService.startWeatherForecastService(MainActivity.this, list);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        WeatherForecastService.startWeatherForecastService(MainActivity.this, new ArrayList<CurrentWeather>());
+                    }
+                });
     }
 
     private BroadcastReceiver weatherDataFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String result = intent.getStringExtra(WeatherForecastService.EXTRA_RESULT);
-            String message;
+            List<CurrentWeather> list = (List<CurrentWeather>) intent.getSerializableExtra(WeatherForecastService.EXTRA_LIST_SEND);
             if (result != null) {
                 if (result.equals(WeatherForecastService.RESULT_OK)) {
-                    setViewPagerAdapter();
-                } else if (result.equals(WeatherForecastService.SERVER_ERROR)) {
-                    message = intent.getStringExtra(WeatherForecastService.EXTRA_MESSAGE);
-                    //Вывожу ошибку
+                    setViewPagerAdapter(list);
                 } else if (result.equals(WeatherForecastService.CONNECTION_ERROR)) {
                     //Вывожу ошибку
+                    setViewPagerAdapter(list);
                 }
             }
         }
     };
 
-    private void setViewPagerAdapter() {
-        AgentAsyncTask startAdapter = new AgentAsyncTask();
-        startAdapter.execute();
-    }
-
-    private void setViewPagerAdapter(int position) {
-        AgentAsyncTask startAdapter = new AgentAsyncTask();
-        startAdapter.execute(position);
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private class AgentAsyncTask extends AsyncTask<Integer, Integer, ViewPagerAdapter> {
-        private Integer listSize, position = null;
-
-        @Override
-        protected ViewPagerAdapter doInBackground(Integer... integer) {
-            CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
-            listSize = currentWeatherDao.getWeatherList().size();
-            if (integer.length != 0) position = integer[0];
-            return new ViewPagerAdapter(MainActivity.this, currentWeatherDao.getWeatherList());
+    private void setViewPagerAdapter(final List<CurrentWeather> list) {
+        ViewPagerAdapter adapter = ViewPagerAdapter.getInstance(MainActivity.this, list);
+        setViewPagerPreferences();
+        adapter.refreshData(list);
+        viewPager.setAdapter(adapter);
+        if (notRunBefore) {
+            notRunBefore = false;
+            viewPager.setCurrentItem(getPosition(), false);
+        } else {
+            viewPager.setCurrentItem(list.size(), false);
         }
-
-        @Override
-        protected void onPostExecute(ViewPagerAdapter adapter) {
-            setViewPagerPreferences();
-            viewPager.setAdapter(adapter);
-            if (position != null) viewPager.setCurrentItem(position);
-            else viewPager.setCurrentItem(listSize);
-
-            //синхронизирую tabLayout с viewPager
-            new TabLayoutMediator(tabLayout, viewPager,
-                    new TabLayoutMediator.TabConfigurationStrategy() {
-                        @Override
-                        public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-
-                        }
-                    }).attach();
-        }
+        //синхронизирую tabLayout с viewPager
+        new TabLayoutMediator(tabLayout, viewPager,
+                new TabLayoutMediator.TabConfigurationStrategy() {
+                    @Override
+                    public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                    }
+                }).attach();
     }
 
     private void setViewPagerPreferences() {

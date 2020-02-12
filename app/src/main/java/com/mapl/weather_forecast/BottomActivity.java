@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import mumayank.com.airlocationlibrary.AirLocation;
@@ -26,7 +28,6 @@ import mumayank.com.airlocationlibrary.AirLocation;
 public class BottomActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private final Handler handler = new Handler();
-    private boolean firstOpen = true;
     private AirLocation airLocation;
     private Activity activity;
     private MapView mapView;
@@ -35,6 +36,10 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
     private BottomSheetBehavior bottomSheet;
     private SearchView searchView;
     private LatLng center;
+    private MaterialCardView topBar;
+    private ImageView location;
+
+    private boolean notRunBefore = true;
 
     BottomActivity(Activity activity, SearchView searchView) {
         this.activity = activity;
@@ -42,7 +47,6 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         onMapReadyCallback = this;
         initView();
         listeners();
-        create();
     }
 
     private void initView() {
@@ -50,13 +54,13 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         mapView = activity.findViewById(R.id.bigMapView);
         fabLocation = activity.findViewById(R.id.my_location);
         fabDone = activity.findViewById(R.id.location_done);
+        topBar = activity.findViewById(R.id.topBar);
+        location = activity.findViewById(R.id.locationImage);
+
         fabLocation.setColorFilter(Color.rgb(255, 255, 255));
         fabDone.setColorFilter(Color.rgb(255, 255, 255));
         fabLocation.animate().scaleX(0).scaleY(0).start();
         fabDone.animate().scaleX(0).scaleY(0).start();
-    }
-
-    private void create() {
     }
 
     private void listeners() {
@@ -86,6 +90,16 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
 
             }
         });
+
+        topBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bottomSheet.getState() == BottomSheetBehavior.STATE_COLLAPSED)
+                    bottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+                else if (bottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED)
+                    bottomSheet.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
     }
 
     @Override
@@ -108,8 +122,8 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                if (firstOpen) {
-                    firstOpen = false;
+                if (notRunBefore) {
+                    notRunBefore = false;
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -122,15 +136,15 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
                             });
                         }
                     }).start();
-                } else {
-                    mapView.onResume();
-                }
+                } else mapView.onResume();
+                location.setImageResource(R.drawable.arrow_down);
                 fabLocation.animate().scaleX(1).scaleY(1).setDuration(300).start();
                 fabDone.animate().scaleX(1).scaleY(1).setDuration(300).start();
             } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                location.setImageResource(R.drawable.ic_location);
                 fabLocation.animate().scaleX(0).scaleY(0).start();
                 fabDone.animate().scaleX(0).scaleY(0).start();
-                mapView.onPause();
+                if (!notRunBefore) mapView.onPause();
             }
         }
 
