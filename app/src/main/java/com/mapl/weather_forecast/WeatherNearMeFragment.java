@@ -66,7 +66,6 @@ public class WeatherNearMeFragment extends Fragment {
 
     private void initView(View root) {
         viewPager = root.findViewById(R.id.weatherNearMeViewPager);
-        ((PageChanged) activity).fabTag(MainActivity.TAG_MY_LOCATION);
     }
 
     private void listeners() {

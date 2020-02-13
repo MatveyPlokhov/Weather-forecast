@@ -1,14 +1,12 @@
 package com.mapl.weather_forecast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.NavigationUI;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,21 +17,23 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
-public class MainActivity extends AppCompatActivity implements PageChanged {
-    public static final String TAG_LOCATIONS = "LOCATIONS";
-    public static final String TAG_MY_LOCATION = "MY_LOCATION";
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final String PREFERENCES = "PREFERENCES";
     private boolean darkTheme;
-    private FragmentManager fragmentManager;
+    private int currentId = -1;
 
     private FloatingActionButton fab;
+    private NavigationView navigationView;
     private BottomAppBar bottomAppBar;
+    private DrawerLayout drawerLayout;
+    private SwitchMaterial switchTheme;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,79 +42,99 @@ public class MainActivity extends AppCompatActivity implements PageChanged {
         setContentView(R.layout.activity_main);
 
         initNotificationChannel();
-        initMain();
         initView();
-        clickListener();
+        setFragment(savedInstanceState);
+        addToggle();
     }
 
-    private void initMain() {
+    private void initView() {
+        navigationView = findViewById(R.id.navigationView);
         bottomAppBar = findViewById(R.id.bottom_app_bar);
-        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
-        NavigationView navigationView = findViewById(R.id.navigationView);
-
-        NavController navController = Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment);
-        addToggle(drawerLayout, bottomAppBar);
-        NavigationUI.setupWithNavController(navigationView, navController);
-
-        MenuItem menuItem = navigationView.getMenu().findItem(R.id.nav_theme);
-        SwitchMaterial switchTheme = menuItem.getActionView().findViewById(R.id.switchTheme);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        fab = findViewById(R.id.fabWithBottomAppBar);
+        switchTheme = navigationView.getMenu().findItem(R.id.nav_theme).
+                getActionView().findViewById(R.id.switchTheme);
         switchTheme.setChecked(darkTheme);
+    }
+
+    private void setFragment(Bundle savedInstanceState) {
+        navigationView.setNavigationItemSelectedListener(this);
+        if (savedInstanceState == null)
+            this.onNavigationItemSelected(navigationView.getMenu().getItem(0));
 
         switchTheme.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    editor.putBoolean("DARK_THEME", true);
-                    editor.apply();
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    editor.putBoolean("DARK_THEME", false);
-                    editor.apply();
+                resetTheme(isChecked);
+            }
+        });
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_fragment);
+                if (currentFragment instanceof SelectedLocationsFragment) {
+                    ((SelectedLocationsFragment) currentFragment).newLocation();
+                } else if (currentFragment instanceof WeatherNearMeFragment) {
+                    Toast.makeText(MainActivity.this, "Share", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    private void setTheme() {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
-        darkTheme = sharedPreferences.getBoolean("DARK_THEME", true);
 
-        if (darkTheme) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        Fragment fragment = null;
+
+        if (id == R.id.nav_selectedLocations && id != currentId) {
+            currentId = id;
+            fab.setImageDrawable(getResources().getDrawable(R.drawable.add));
+            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
+            fragment = new SelectedLocationsFragment();
+            item.setChecked(true);
+        } else if (id == R.id.nav_weatherNearMe && id != currentId) {
+            currentId = id;
+            fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
+            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
+            fragment = new WeatherNearMeFragment();
+            item.setChecked(true);
+        } else if (id == R.id.nav_theme) {
+            switchTheme.setChecked(!switchTheme.isChecked());
+            resetTheme(switchTheme.isChecked());
         }
+
+        if (fragment != null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.nav_fragment, fragment).commit();
+            drawerLayout.closeDrawers();
+        }
+        return true;
     }
 
-    private void addToggle(DrawerLayout drawerLayout, BottomAppBar bottomAppBar) {
+    private void addToggle() {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 MainActivity.this, drawerLayout, bottomAppBar, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }
 
-    private void initView() {
-        fab = findViewById(R.id.fabWithBottomAppBar);
-        fab.setTag(TAG_LOCATIONS);
+    private void setTheme() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        darkTheme = sharedPreferences.getBoolean("DARK_THEME", true);
+        if (darkTheme) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
-    private void clickListener() {
-        fragmentManager = getSupportFragmentManager();
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (fab.getTag().equals(TAG_LOCATIONS)) {
-                    NavHostFragment navHostFragment = (NavHostFragment) fragmentManager.findFragmentById(R.id.nav_host_fragment);
-                    SelectedLocationsFragment fragment = (SelectedLocationsFragment) navHostFragment.getChildFragmentManager().getFragments().get(0);
-                    fragment.newLocation();
-                } else if (fab.getTag().equals(TAG_MY_LOCATION)) {
-
-                }
-            }
-        });
+    private void resetTheme(boolean darkTheme) {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (darkTheme) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        editor.putBoolean("DARK_THEME", darkTheme);
+        editor.apply();
     }
 
     private void initNotificationChannel() {
@@ -125,18 +145,6 @@ public class MainActivity extends AppCompatActivity implements PageChanged {
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(notificationChannel);
             }
-        }
-    }
-
-    @Override
-    public void fabTag(String tag) {
-        fab.setTag(tag);
-        if (fab.getTag().equals(TAG_LOCATIONS)) {
-            fab.setImageDrawable(getResources().getDrawable(R.drawable.add));
-            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
-        } else if (fab.getTag().equals(TAG_MY_LOCATION)) {
-            fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
-            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
         }
     }
 }

@@ -84,7 +84,6 @@ public class SelectedLocationsFragment extends Fragment {
         viewPager = root.findViewById(R.id.mainViewPager);
         tabLayout = root.findViewById(R.id.tabLayout);
         tabLayout.setTabRippleColor(null);
-        ((PageChanged) activity).fabTag(MainActivity.TAG_LOCATIONS);
     }
 
     private void setPosition() {
