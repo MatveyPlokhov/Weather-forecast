@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
 import com.mapl.weather_forecast.database.model.CurrentWeather;
 import com.mapl.weather_forecast.service.WeatherForecastService;
@@ -31,7 +30,6 @@ import mumayank.com.airlocationlibrary.AirLocation;
 
 public class WeatherNearMeFragment extends Fragment {
     public static final String BROADCAST_ACTION_WEATHER_MY_LOCATION = "com.mapl.weather_forecast.services.weathermylocationfinished";
-    private FloatingActionButton fab;
     private ViewPager2 viewPager;
     private Activity activity;
 
@@ -69,7 +67,6 @@ public class WeatherNearMeFragment extends Fragment {
     }
 
     private void listeners() {
-
         new AirLocation(activity, true, true,
                 new AirLocation.Callbacks() {
                     @Override
@@ -86,7 +83,7 @@ public class WeatherNearMeFragment extends Fragment {
 
                     @Override
                     public void onFailed(AirLocation.LocationFailedEnum locationFailedEnum) {
-
+                        Toast.makeText(activity, "Не обновилась локация", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
