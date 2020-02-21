@@ -11,14 +11,20 @@ import androidx.fragment.app.FragmentManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -43,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         initNotificationChannel();
         initView();
+        setAccount();
         setFragment(savedInstanceState);
         addToggle();
     }
@@ -55,6 +62,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switchTheme = navigationView.getMenu().findItem(R.id.nav_theme).
                 getActionView().findViewById(R.id.switchTheme);
         switchTheme.setChecked(darkTheme);
+    }
+
+    private void setAccount() {
+        Intent intent = getIntent();
+        GoogleSignInAccount account = intent.getParcelableExtra("ACCOUNT");
+        View header = navigationView.getHeaderView(0);
+        ImageView avatar = header.findViewById(R.id.avatar);
+        TextView nick = header.findViewById(R.id.nick);
+        TextView email = header.findViewById(R.id.email);
+
+        if (account != null) {
+            Glide.with(MainActivity.this)
+                    .load(account.getPhotoUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(avatar);
+            nick.setText(account.getGivenName());
+            email.setText(account.getEmail());
+        } else {
+            Glide.with(MainActivity.this)
+                    .load(getResources().getDrawable(R.drawable.mapl))
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(avatar);
+        }
     }
 
     private void setFragment(Bundle savedInstanceState) {

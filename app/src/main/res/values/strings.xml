@@ -17,4 +17,6 @@
     <string name="weather_near_me">Weather near me</string>
     <string name="selected_locations">Selected locations</string>
     <string name="dark_mode">Dark mode</string>
+    <string name="name" translatable="false">Name</string>
+    <string name="email" translatable="false">Email</string>
 </resources>
