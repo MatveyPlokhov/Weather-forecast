@@ -29,6 +29,7 @@ import mumayank.com.airlocationlibrary.AirLocation;
 
 public class WeatherNearMeFragment extends Fragment {
     public static final String BROADCAST_ACTION_WEATHER_MY_LOCATION = "com.mapl.weather_forecast.services.weathermylocationfinished";
+    private AirLocation airLocation;
     private ViewPager2 viewPager;
     private Activity activity;
 
@@ -66,7 +67,7 @@ public class WeatherNearMeFragment extends Fragment {
     }
 
     void listeners() {
-        new AirLocation(activity, true, true,
+        airLocation = new AirLocation(activity, true, true,
                 new AirLocation.Callbacks() {
                     @Override
                     public void onSuccess(@NonNull final Location location) {
