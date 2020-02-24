@@ -144,6 +144,7 @@ public class SelectedLocationsFragment extends Fragment {
                 .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
                     @Override
                     public void onSuccess(List<CurrentWeather> list) {
+                        setViewPagerAdapter(list, false);
                         WeatherForecastService.startWeatherForecastService(getContext(), list, true);
                     }
 
@@ -161,27 +162,26 @@ public class SelectedLocationsFragment extends Fragment {
             List<CurrentWeather> list = (List<CurrentWeather>) intent.getSerializableExtra(WeatherForecastService.EXTRA_LIST_SEND);
             if (result != null) {
                 if (result.equals(WeatherForecastService.RESULT_OK)) {
-                    setViewPagerAdapter(list);
+                    if (notRunBefore) {
+                        setViewPagerAdapter(list, false);
+                        notRunBefore = false;
+                    } else setViewPagerAdapter(list, true);
                 } else if (result.equals(WeatherForecastService.CONNECTION_ERROR)) {
                     //Вывожу ошибку
-                    setViewPagerAdapter(list);
+                    setViewPagerAdapter(list, true);
                 }
             }
         }
     };
 
-    private void setViewPagerAdapter(final List<CurrentWeather> list) {
+    private void setViewPagerAdapter(final List<CurrentWeather> list, boolean loadDataBase) {
         this.list = list;
         ViewPagerAdapter adapter = ViewPagerAdapter.getInstance(activity, list);
         setViewPagerPreferences();
         adapter.refreshData(list);
         viewPager.setAdapter(adapter);
-        if (notRunBefore) {
-            notRunBefore = false;
-            viewPager.setCurrentItem(getPosition(), false);
-        } else {
-            viewPager.setCurrentItem(list.size(), false);
-        }
+        if (loadDataBase) viewPager.setCurrentItem(list.size(), false);
+        else viewPager.setCurrentItem(getPosition(), false);
         //синхронизирую tabLayout с viewPager
         new TabLayoutMediator(tabLayout, viewPager,
                 new TabLayoutMediator.TabConfigurationStrategy() {

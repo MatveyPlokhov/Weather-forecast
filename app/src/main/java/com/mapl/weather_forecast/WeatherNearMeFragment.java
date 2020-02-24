@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +65,7 @@ public class WeatherNearMeFragment extends Fragment {
         viewPager = root.findViewById(R.id.weatherNearMeViewPager);
     }
 
-    private void listeners() {
+    void listeners() {
         new AirLocation(activity, true, true,
                 new AirLocation.Callbacks() {
                     @Override
@@ -78,7 +77,6 @@ public class WeatherNearMeFragment extends Fragment {
                         currentWeather.longitude = location.getLongitude();
                         list.add(currentWeather);
                         WeatherForecastService.startWeatherForecastService(getContext(), list, false);
-                        Log.i("Location", "Получил локацию");
                     }
 
                     @Override

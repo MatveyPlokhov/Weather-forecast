@@ -1,6 +1,7 @@
 package com.mapl.weather_forecast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -87,6 +88,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1235 && resultCode == RESULT_OK) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_fragment);
+            if (currentFragment != null) {
+                ((WeatherNearMeFragment) currentFragment).listeners();
+            }
+        }
+    }
+
     private void setFragment(Bundle savedInstanceState) {
         navigationView.setNavigationItemSelectedListener(this);
         if (savedInstanceState == null)
@@ -104,9 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View v) {
                 FragmentManager fragmentManager = getSupportFragmentManager();
                 Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_fragment);
-                if (currentFragment instanceof SelectedLocationsFragment) {
-                    ((SelectedLocationsFragment) currentFragment).newLocation();
-                } else if (currentFragment instanceof WeatherNearMeFragment) {
+                if (currentFragment != null) {
                     Toast.makeText(MainActivity.this, "Share", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -119,13 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
         Fragment fragment = null;
 
-        if (id == R.id.nav_selectedLocations && id != currentId) {
-            currentId = id;
-            fab.setImageDrawable(getResources().getDrawable(R.drawable.add));
-            bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_END);
-            fragment = new SelectedLocationsFragment();
-            item.setChecked(true);
-        } else if (id == R.id.nav_weatherNearMe && id != currentId) {
+        if (id == R.id.nav_weatherNearMe && id != currentId) {
             currentId = id;
             fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_share));
             bottomAppBar.setFabAlignmentMode(BottomAppBar.FAB_ALIGNMENT_MODE_CENTER);
