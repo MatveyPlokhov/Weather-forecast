@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,15 +20,18 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.mapl.weather_forecast.adapter.ViewPagerAdapter;
 import com.mapl.weather_forecast.database.model.CurrentWeather;
 import com.mapl.weather_forecast.service.WeatherForecastService;
+import com.yayandroid.locationmanager.LocationManager;
+import com.yayandroid.locationmanager.configuration.GooglePlayServicesConfiguration;
+import com.yayandroid.locationmanager.configuration.LocationConfiguration;
+import com.yayandroid.locationmanager.configuration.PermissionConfiguration;
+import com.yayandroid.locationmanager.listener.LocationListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mumayank.com.airlocationlibrary.AirLocation;
-
 public class WeatherNearMeFragment extends Fragment {
     public static final String BROADCAST_ACTION_WEATHER_MY_LOCATION = "com.mapl.weather_forecast.services.weathermylocationfinished";
-    private AirLocation airLocation;
+    private LocationManager locationManager;
     private ViewPager2 viewPager;
     private Activity activity;
 
@@ -44,7 +46,7 @@ public class WeatherNearMeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_weather_near_me, container, false);
         initView(root);
-        listeners();
+        location();
         return root;
     }
 
@@ -57,20 +59,55 @@ public class WeatherNearMeFragment extends Fragment {
 
     @Override
     public void onStop() {
-        activity.registerReceiver(weatherDataFinishedReceiver,
-                new IntentFilter(BROADCAST_ACTION_WEATHER_MY_LOCATION));
+        activity.unregisterReceiver(weatherDataFinishedReceiver);
         super.onStop();
     }
 
-    private void initView(View root) {
-        viewPager = root.findViewById(R.id.weatherNearMeViewPager);
+    @Override
+    public void onDestroy() {
+        locationManager.onDestroy();
+        super.onDestroy();
     }
 
-    void listeners() {
-        airLocation = new AirLocation(activity, true, true,
-                new AirLocation.Callbacks() {
+    @Override
+    public void onPause() {
+        locationManager.onPause();
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        locationManager.onResume();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        locationManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        locationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    private void location() {
+        locationManager = new LocationManager.Builder(activity.getApplicationContext())
+                .fragment(this)
+                .configuration(new LocationConfiguration.Builder()
+                        .keepTracking(true)
+                        .askForPermission(new PermissionConfiguration.Builder().build())
+                        .useGooglePlayServices(new GooglePlayServicesConfiguration.Builder().build())
+                        .build())
+                .notify(new LocationListener() {
                     @Override
-                    public void onSuccess(@NonNull final Location location) {
+                    public void onProcessTypeChanged(int processType) {
+                    }
+
+                    @Override
+                    public void onLocationChanged(Location location) {
                         List<CurrentWeather> list = new ArrayList<>();
                         CurrentWeather currentWeather = new CurrentWeather();
                         currentWeather.location = "My location";
@@ -81,10 +118,31 @@ public class WeatherNearMeFragment extends Fragment {
                     }
 
                     @Override
-                    public void onFailed(AirLocation.LocationFailedEnum locationFailedEnum) {
-                        Toast.makeText(activity, "Не обновилась локация", Toast.LENGTH_SHORT).show();
+                    public void onLocationFailed(int type) {
                     }
-                });
+
+                    @Override
+                    public void onPermissionGranted(boolean alreadyHadPermission) {
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+                    }
+                })
+                .build();
+        locationManager.get();
+    }
+
+    private void initView(View root) {
+        viewPager = root.findViewById(R.id.weatherNearMeViewPager);
     }
 
     private BroadcastReceiver weatherDataFinishedReceiver = new BroadcastReceiver() {

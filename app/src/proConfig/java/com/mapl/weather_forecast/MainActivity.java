@@ -1,7 +1,6 @@
 package com.mapl.weather_forecast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -168,26 +167,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1235 && resultCode == RESULT_OK) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_fragment);
-            if (currentFragment instanceof WeatherNearMeFragment) {
-                ((WeatherNearMeFragment) currentFragment).listeners();
-            }
-        }
+        dispatchToFragment(requestCode, resultCode, data);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1236) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_fragment);
-            if (currentFragment instanceof WeatherNearMeFragment) {
-                ((WeatherNearMeFragment) currentFragment).listeners();
-            }
+    private void dispatchToFragment(int requestCode, int resultCode, Intent data) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_fragment);
+        if (currentFragment instanceof WeatherNearMeFragment) {
+            currentFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 

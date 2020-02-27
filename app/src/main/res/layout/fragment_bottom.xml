@@ -41,7 +41,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:contentDescription="@string/location"
         android:paddingBottom="40dp"
+        android:scaleX="0"
+        android:scaleY="0"
         android:src="@drawable/ic_pointer"
         app:layout_constraintBottom_toBottomOf="@+id/bigMapView"
         app:layout_constraintEnd_toEndOf="@+id/bigMapView"
@@ -49,24 +52,28 @@
         app:layout_constraintTop_toTopOf="@+id/bigMapView" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/my_location"
+        android:id="@+id/fabLocation"
         style="@style/Widget.Design.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/fab_margin"
+        android:scaleX="0"
+        android:scaleY="0"
         android:src="@drawable/my_location"
         app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@+id/location_done"
-        app:layout_constraintEnd_toEndOf="@+id/location_done"
-        app:layout_constraintStart_toStartOf="@+id/location_done" />
+        app:layout_constraintBottom_toTopOf="@+id/fabDone"
+        app:layout_constraintEnd_toEndOf="@+id/fabDone"
+        app:layout_constraintStart_toStartOf="@+id/fabDone" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/location_done"
+        android:id="@+id/fabDone"
         style="@style/Widget.Design.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
+        android:scaleX="0"
+        android:scaleY="0"
         android:src="@drawable/done"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"

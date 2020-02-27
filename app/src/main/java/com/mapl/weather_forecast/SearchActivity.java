@@ -65,7 +65,9 @@ public class SearchActivity extends AppCompatActivity implements Postman {
         MenuItem menuItem = menu.findItem(R.id.action_search);
         MenuItem microItem = menu.findItem(R.id.action_micro);
         SearchView searchView = (SearchView) menuItem.getActionView();
-        new BottomActivity(SearchActivity.this, searchView);
+
+        BottomSheetFragment bottomSheetFragment = BottomSheetFragment.newInstance();
+        bottomSheetFragment.show(getSupportFragmentManager(), "add_bottom_sheet_fragment");
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
