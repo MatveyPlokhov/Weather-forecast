@@ -14,11 +14,11 @@
         android:icon="@drawable/ic_launcher_foreground"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/MyTheme.DayNight">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/map_key" />
+            android:value="AIzaSyBzU7DN9uk6mqTEIPYrmkKKlQEUHMnvNo4" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -56,16 +56,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LocationWeatherActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".BottomActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SearchActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".SettingsActivity"
             android:screenOrientation="portrait" />
     </application>
 

@@ -3,49 +3,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawerLayout"
-    style="@style/layoutMM"
-    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <FrameLayout
-        android:id="@+id/frameLayout"
-        style="@style/layoutMM">
+    <androidx.constraintlayout.widget.ConstraintLayout style="@style/layoutMM">
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/nav_fragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top" />
+            android:layout_height="match_parent"
+            android:layout_marginBottom="56dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/mainViewPager"
-            style="@style/layoutMM"
-            android:layout_marginTop="?android:actionBarSize"
-            android:layout_marginBottom="80dp"
-            android:paddingStart="8dp"
-            android:paddingTop="8dp"
-            android:paddingEnd="8dp"
-            android:paddingBottom="8dp" />
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/bottomAppBar"
             android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:layout_gravity="bottom"
-            android:layout_marginBottom="?android:actionBarSize"
-            android:hapticFeedbackEnabled="false"
-            app:tabBackground="@drawable/tab_selector"
-            app:tabGravity="center"
-            app:tabIndicatorHeight="0dp" />
+            android:layout_height="84dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-        <include
-            android:id="@+id/bottomAppBarCoordinatorLayout"
-            layout="@layout/bottom_bar"
-            android:layout_width="match_parent"
-            android:layout_height="88dp"
-            android:layout_gravity="bottom" />
-    </FrameLayout>
+            <com.google.android.material.bottomappbar.BottomAppBar
+                android:id="@+id/bottom_app_bar"
+                style="@style/Widget.MaterialComponents.BottomAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                app:fabAlignmentMode="end"
+                app:fabAnimationMode="scale"
+                app:fabCradleRoundedCornerRadius="100dp"
+                app:hideOnScroll="true"
+                app:layout_scrollFlags="scroll|enterAlways" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabWithBottomAppBar"
+                style="@style/Widget.Design.FloatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/add"
+                app:fabSize="normal"
+                app:layout_anchor="@+id/bottom_app_bar" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"

@@ -1,22 +1,14 @@
 <resources>
-    <string name="today">Сегодня</string>
-    <string name="tomorrow">Завтра</string>
-    <string name="day">День</string>
-    <string name="night">Ночь</string>
     <string name="search">Поиск</string>
-    <string name="snackbarInfo">Город добавлен в список</string>
     <string name="weather_data_false">Данные не могут обновиться</string>
     <string name="temperature">Температура</string>
     <string name="feels_like">По ощущению </string>
-    <string name="temperature_min">Температура min</string>
-    <string name="temperature_max">Температура max</string>
     <string name="pressure">Давление</string>
     <string name="humidity">Влажность</string>
-    <string name="locations">Местоположения</string>
-    <string name="settings">Настройки</string>
     <string name="help_feedback"><![CDATA[Справка/отзыв]]></string>
     <string name="about_weather_forecast">О WeatherForecast</string>
-    <string name="add_new_location">Новое местоположение</string>
     <string name="person">Пользователь</string>
     <string name="weather_near_me">Погода рядом со мной</string>
+    <string name="selected_locations">Выбранные места</string>
+    <string name="dark_mode">Тёмная тема</string>
 </resources>

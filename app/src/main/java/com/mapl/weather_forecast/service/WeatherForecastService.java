@@ -8,8 +8,9 @@ import android.content.Context;
 
 import androidx.core.app.NotificationCompat;
 
+import com.mapl.weather_forecast.SelectedLocationsFragment;
+import com.mapl.weather_forecast.WeatherNearMeFragment;
 import com.mapl.weather_forecast.database.CurrentWeatherSingleton;
-import com.mapl.weather_forecast.MainActivity;
 import com.mapl.weather_forecast.R;
 import com.mapl.weather_forecast.database.dao.CurrentWeatherDao;
 import com.mapl.weather_forecast.database.model.CurrentWeather;
@@ -34,6 +35,7 @@ import retrofit2.Response;
 
 public class WeatherForecastService extends IntentService {
     private static final String EXTRA_LIST = "com.mapl.weather_forecast.services.extra.LIST";
+    private static final String EXTRA_BOOL = "com.mapl.weather_forecast.services.extra.BOOL";
     public static final String EXTRA_LIST_SEND = "com.mapl.weather_forecast.services.extra.LIST_SEND";
     public static final String EXTRA_RESULT = "com.mapl.weather_forecast.services.extra.RESULT";
 
@@ -46,22 +48,28 @@ public class WeatherForecastService extends IntentService {
         super("WeatherForecastService");
     }
 
-    public static void startWeatherForecastService(Context context, List<CurrentWeather> list) {
-        Intent intent = new Intent(context, WeatherForecastService.class);
-        intent.putExtra(EXTRA_LIST, (ArrayList<CurrentWeather>) list);
-        context.startService(intent);
+    public static void startWeatherForecastService(Context context, List<CurrentWeather> list, boolean changeDatabase) {
+        try{
+            Intent intent = new Intent(context, WeatherForecastService.class);
+            intent.putExtra(EXTRA_LIST, (ArrayList<CurrentWeather>) list);
+            intent.putExtra(EXTRA_BOOL, changeDatabase);
+            context.startService(intent);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             List<CurrentWeather> list = (List<CurrentWeather>) intent.getSerializableExtra(EXTRA_LIST);
-            if (list != null) loadLocationData(list);
+            boolean changeDatabase = intent.getBooleanExtra(EXTRA_BOOL,false);
+            if (list != null) loadLocationData(list,changeDatabase);
         }
     }
 
     @SuppressLint("CheckResult")
-    private void loadLocationData(final List<CurrentWeather> list) {
+    private void loadLocationData(final List<CurrentWeather> list, boolean changeDatabase) {
         CurrentWeatherDao currentWeatherDao = CurrentWeatherSingleton.getInstance().getCurrentWeatherDao();
         boolean clientError = false, serverError = false;
         for (final CurrentWeather currentWeather : list) {
@@ -98,32 +106,41 @@ public class WeatherForecastService extends IntentService {
                 }
             } else break;
         }
+        if (changeDatabase) {
+            if (!serverError && !clientError) {
+                Observable.fromCallable(new CallableAddInDatabase(list, currentWeatherDao))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<List<CurrentWeather>>() {
+                            @Override
+                            public void accept(final List<CurrentWeather> list) {
+                                sendBroadcast("RESULT_OK", list,
+                                        SelectedLocationsFragment.BROADCAST_ACTION_WEATHER);
+                            }
+                        });
+            } else {
+                currentWeatherDao.getWeatherListSingle()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
+                            @Override
+                            public void onSuccess(List<CurrentWeather> list) {
+                                sendBroadcast("CONNECTION_ERROR", list,
+                                        SelectedLocationsFragment.BROADCAST_ACTION_WEATHER);
+                            }
 
-        if (!serverError && !clientError) {
-            Observable.fromCallable(new CallableAddInDatabase(list, currentWeatherDao))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<List<CurrentWeather>>() {
-                        @Override
-                        public void accept(final List<CurrentWeather> list) {
-                            sendBroadcast("RESULT_OK", list);
-                        }
-                    });
+                            @Override
+                            public void onError(Throwable e) {
+                                sendBroadcast("CONNECTION_ERROR", new ArrayList<CurrentWeather>(),
+                                        SelectedLocationsFragment.BROADCAST_ACTION_WEATHER);
+                            }
+                        });
+            }
         } else {
-            currentWeatherDao.getWeatherListSingle()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableSingleObserver<List<CurrentWeather>>() {
-                        @Override
-                        public void onSuccess(List<CurrentWeather> list) {
-                            sendBroadcast("CONNECTION_ERROR", list);
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            sendBroadcast("CONNECTION_ERROR", new ArrayList<CurrentWeather>());
-                        }
-                    });
+            if (!serverError && !clientError) sendBroadcast("RESULT_OK", list,
+                    WeatherNearMeFragment.BROADCAST_ACTION_WEATHER_MY_LOCATION);
+            else sendBroadcast("CONNECTION_ERROR", new ArrayList<CurrentWeather>(),
+                    WeatherNearMeFragment.BROADCAST_ACTION_WEATHER_MY_LOCATION);
         }
     }
 
@@ -145,8 +162,8 @@ public class WeatherForecastService extends IntentService {
         }
     }
 
-    private void sendBroadcast(String result, List<CurrentWeather> list) {
-        Intent broadcastIntent = new Intent(MainActivity.BROADCAST_ACTION_WEATHER);
+    private void sendBroadcast(String result, List<CurrentWeather> list, String action) {
+        Intent broadcastIntent = new Intent(action);
         broadcastIntent.putExtra(EXTRA_RESULT, result);
         broadcastIntent.putExtra(EXTRA_LIST_SEND, (ArrayList<CurrentWeather>) list);
         sendBroadcast(broadcastIntent);

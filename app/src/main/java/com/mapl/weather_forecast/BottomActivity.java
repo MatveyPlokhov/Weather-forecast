@@ -1,15 +1,15 @@
 package com.mapl.weather_forecast;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Color;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.os.Handler;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 
@@ -18,26 +18,26 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 import mumayank.com.airlocationlibrary.AirLocation;
 
 public class BottomActivity extends AppCompatActivity implements OnMapReadyCallback {
-
     private final Handler handler = new Handler();
-    private AirLocation airLocation;
     private Activity activity;
     private MapView mapView;
+    private GoogleMap googleMap;
     private FloatingActionButton fabDone, fabLocation;
     private OnMapReadyCallback onMapReadyCallback;
     private BottomSheetBehavior bottomSheet;
     private SearchView searchView;
     private LatLng center;
     private MaterialCardView topBar;
-    private ImageView location;
+    private ImageView location, pointer;
 
     private boolean notRunBefore = true;
 
@@ -56,9 +56,9 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         fabDone = activity.findViewById(R.id.location_done);
         topBar = activity.findViewById(R.id.topBar);
         location = activity.findViewById(R.id.locationImage);
+        pointer = activity.findViewById(R.id.pointerImageView);
 
-        fabLocation.setColorFilter(Color.rgb(255, 255, 255));
-        fabDone.setColorFilter(Color.rgb(255, 255, 255));
+        pointer.animate().scaleX(0).scaleY(0).start();
         fabLocation.animate().scaleX(0).scaleY(0).start();
         fabDone.animate().scaleX(0).scaleY(0).start();
     }
@@ -69,7 +69,7 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         fabLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                airLocation = new AirLocation(activity, true, true, new AirLocation.Callbacks() {
+                new AirLocation(activity, true, true, new AirLocation.Callbacks() {
                     @Override
                     public void onSuccess(@NonNull Location location) {
                         center = new LatLng(location.getLatitude(), location.getLongitude());
@@ -78,7 +78,7 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
 
                     @Override
                     public void onFailed(@NonNull AirLocation.LocationFailedEnum locationFailedEnum) {
-
+                        //ошибка в предоставлении разрешения/поиска локации
                     }
                 });
             }
@@ -87,7 +87,25 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         fabDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                @SuppressLint("InflateParams")
+                View view = LayoutInflater.from(activity).inflate(R.layout.textinputlayout_item, null);
+                final TextInputEditText inputEditText = view.findViewById(R.id.textInputEditText);
+                new MaterialAlertDialogBuilder(activity)
+                        .setView(view)
+                        .setTitle("Введите название:")
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                ((Postman) activity).getLocationInfo(
+                                        String.valueOf(inputEditText.getText()),
+                                        googleMap.getCameraPosition().target.latitude,
+                                        googleMap.getCameraPosition().target.longitude
+                                );
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                System.out.println(googleMap.getCameraPosition().target);
             }
         });
 
@@ -103,7 +121,11 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
+        if (notRunBefore) {
+            notRunBefore = false;
+            this.googleMap = googleMap;
+        }
         googleMap.getUiSettings().setCompassEnabled(false);
         googleMap.getUiSettings().setIndoorLevelPickerEnabled(false);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
@@ -111,10 +133,7 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
-        if (center != null) {
-            googleMap.addMarker(new MarkerOptions().position(center));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 13f));
-        }
+        if (center != null) googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 15f));
         mapView.onResume();
     }
 
@@ -123,7 +142,6 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                 if (notRunBefore) {
-                    notRunBefore = false;
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -138,10 +156,12 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
                     }).start();
                 } else mapView.onResume();
                 location.setImageResource(R.drawable.arrow_down);
+                pointer.animate().scaleX(1).scaleY(1).setDuration(300).start();
                 fabLocation.animate().scaleX(1).scaleY(1).setDuration(300).start();
                 fabDone.animate().scaleX(1).scaleY(1).setDuration(300).start();
             } else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                 location.setImageResource(R.drawable.ic_location);
+                pointer.animate().scaleX(0).scaleY(0).start();
                 fabLocation.animate().scaleX(0).scaleY(0).start();
                 fabDone.animate().scaleX(0).scaleY(0).start();
                 if (!notRunBefore) mapView.onPause();
@@ -155,52 +175,4 @@ public class BottomActivity extends AppCompatActivity implements OnMapReadyCallb
             }
         }
     };
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        airLocation.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        airLocation.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mapView.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mapView.onStop();
-    }
-
-    @Override
-    protected void onPause() {
-        mapView.onPause();
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        mapView.onDestroy();
-        super.onDestroy();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapView.onLowMemory();
-    }
 }

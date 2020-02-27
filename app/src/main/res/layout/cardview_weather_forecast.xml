@@ -7,77 +7,68 @@
     style="@style/layoutMW"
     card_view:cardCornerRadius="8dp">
 
-    <FrameLayout style="@style/layoutMM">
+    <View
+        android:id="@+id/backgroundView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/imageViewBackground"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:scaleType="centerCrop"
-            tools:ignore="ContentDescription" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout style="@style/layoutMM">
 
             <TextView
-                android:id="@+id/textViewLocation"
-                style="@style/layoutWW"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Location" />
-
-            <ImageView
-                android:id="@+id/imageViewWeatherToday"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewLocation"
-                tools:ignore="ContentDescription"
-                tools:src="@drawable/mist" />
-
-            <TextView
                 android:id="@+id/textViewDescription"
                 style="@style/layoutWW"
-                android:layout_width="0dp"
+                android:layout_marginTop="16dp"
                 android:textAlignment="center"
                 app:layout_constraintEnd_toEndOf="@+id/imageViewWeatherToday"
                 app:layout_constraintStart_toStartOf="@+id/imageViewWeatherToday"
-                app:layout_constraintTop_toBottomOf="@+id/imageViewWeatherToday"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:text="Description" />
+
+            <ImageView
+                android:id="@+id/imageViewWeatherToday"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDescription"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_weather_clear_night" />
 
             <TextView
                 android:id="@+id/textViewTemperature"
                 style="@style/layoutWW"
+                android:layout_marginTop="8dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewFeelsLike"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewWeatherToday"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:text="Temp" />
 
             <TextView
                 android:id="@+id/textViewFeelsLike"
                 style="@style/layoutWW"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewPressure"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/textViewTemperature"
                 app:layout_constraintStart_toStartOf="@+id/textViewTemperature"
                 tools:text="FeelsLike" />
 
             <TextView
                 android:id="@+id/textViewPressure"
                 style="@style/layoutWW"
-                android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/textViewHumidity"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/textViewFeelsLike"
                 app:layout_constraintStart_toStartOf="@+id/textViewFeelsLike"
                 tools:text="Pressure" />
 
             <TextView
                 android:id="@+id/textViewHumidity"
                 style="@style/layoutWW"
-                app:layout_constraintBottom_toBottomOf="@+id/textViewDescription"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPressure"
                 app:layout_constraintStart_toStartOf="@+id/textViewPressure"
                 tools:text="Humidity" />
 

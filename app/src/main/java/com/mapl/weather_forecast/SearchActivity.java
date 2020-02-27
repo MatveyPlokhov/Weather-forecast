@@ -41,7 +41,7 @@ public class SearchActivity extends AppCompatActivity implements Postman {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        setTheme(R.style.AppDefault);
+        setTheme(R.style.MyTheme_DayNight);
         setTitle("");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
