@@ -56,9 +56,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BottomSheetActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".SearchActivity"
             android:screenOrientation="portrait" />
     </application>

@@ -1,25 +1,17 @@
-package com.mapl.weather_forecast.Presenter;
-
-import android.app.Activity;
-import android.view.View;
+package com.mapl.weather_forecast.presenter;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
-import com.mapl.weather_forecast.Model.BottomSheetModel;
-import com.mapl.weather_forecast.View.BottomSheetView;
+import com.mapl.weather_forecast.view.BottomSheetView;
 
 import moxy.InjectViewState;
 import moxy.MvpPresenter;
 
 @InjectViewState
 public class BottomSheetPresenter extends MvpPresenter<BottomSheetView> {
-    private BottomSheetModel model;
 
     @Override
     protected void onFirstViewAttach() {
         super.onFirstViewAttach();
-        model = new BottomSheetModel();
     }
 
     @Override
@@ -38,27 +30,29 @@ public class BottomSheetPresenter extends MvpPresenter<BottomSheetView> {
         }
     }
 
-    public void fabLocationClick() {
-        /*model.getLocation();
-        model.setLocation();*/
-    }
-
-    public void fabDoneClick(Activity activity, View dialog, TextInputEditText inputEditText) {
-        MaterialAlertDialogBuilder alertDialog = model.getDialog(activity, dialog, inputEditText);
-        getViewState().setDialog(alertDialog);
-    }
-
     public void bottomSheetSlide(float slideOffset) {
-        //model.clearFocus(slideOffset);
+        if (slideOffset > 0)
+            getViewState().clearFocus();
     }
 
     public void bottomSheetStateChanged(int newState) {
         switch (newState) {
             case BottomSheetBehavior.STATE_EXPANDED:
-                //model.bottomSheetExpanded();
+                getViewState().bottomSheetExpanded();
                 break;
             case BottomSheetBehavior.STATE_COLLAPSED:
-                //model.bottomSheetCollapsed();
+                getViewState().bottomSheetCollapsed();
+                break;
+        }
+    }
+
+    public void backPressed(int state) {
+        switch (state) {
+            case BottomSheetBehavior.STATE_EXPANDED:
+                getViewState().closeBottomSheet();
+                break;
+            case BottomSheetBehavior.STATE_COLLAPSED:
+                getViewState().closeSearchActivity();
                 break;
         }
     }
