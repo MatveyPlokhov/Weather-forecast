@@ -49,14 +49,10 @@ public class WeatherForecastService extends IntentService {
     }
 
     public static void startWeatherForecastService(Context context, List<CurrentWeather> list, boolean changeDatabase) {
-        try{
-            Intent intent = new Intent(context, WeatherForecastService.class);
-            intent.putExtra(EXTRA_LIST, (ArrayList<CurrentWeather>) list);
-            intent.putExtra(EXTRA_BOOL, changeDatabase);
-            context.startService(intent);
-        }catch (Exception e){
-            System.out.println(e.getMessage());
-        }
+        Intent intent = new Intent(context, WeatherForecastService.class);
+        intent.putExtra(EXTRA_LIST, (ArrayList<CurrentWeather>) list);
+        intent.putExtra(EXTRA_BOOL, changeDatabase);
+        context.startService(intent);
     }
 
     @Override
