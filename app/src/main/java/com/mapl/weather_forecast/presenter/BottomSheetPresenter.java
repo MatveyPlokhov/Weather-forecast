@@ -30,6 +30,14 @@ public class BottomSheetPresenter extends MvpPresenter<BottomSheetView> {
         }
     }
 
+    public void fabLocationClick() {
+        getViewState().setLocation();
+    }
+
+    public void fabDoneClick() {
+        getViewState().setDialog();
+    }
+
     public void bottomSheetSlide(float slideOffset) {
         if (slideOffset > 0)
             getViewState().clearFocus();

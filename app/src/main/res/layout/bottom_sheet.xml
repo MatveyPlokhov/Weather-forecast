@@ -27,7 +27,7 @@
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.gms.maps.MapView
-        android:id="@+id/bigMapView"
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="#ECE9E0"
@@ -46,10 +46,10 @@
         android:scaleX="0"
         android:scaleY="0"
         android:src="@drawable/ic_pointer"
-        app:layout_constraintBottom_toBottomOf="@+id/bigMapView"
-        app:layout_constraintEnd_toEndOf="@+id/bigMapView"
-        app:layout_constraintStart_toStartOf="@+id/bigMapView"
-        app:layout_constraintTop_toTopOf="@+id/bigMapView" />
+        app:layout_constraintBottom_toBottomOf="@+id/mapView"
+        app:layout_constraintEnd_toEndOf="@+id/mapView"
+        app:layout_constraintStart_toStartOf="@+id/mapView"
+        app:layout_constraintTop_toTopOf="@+id/mapView" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabLocation"

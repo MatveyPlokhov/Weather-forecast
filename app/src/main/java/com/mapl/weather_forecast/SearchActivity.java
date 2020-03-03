@@ -2,22 +2,19 @@ package com.mapl.weather_forecast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,34 +28,38 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mapl.weather_forecast.adapter.CityDataClassSearchPage;
 import com.mapl.weather_forecast.adapter.RecyclerViewAdapterSearchPage;
-import com.mapl.weather_forecast.loader.CityDataLoader;
 import com.mapl.weather_forecast.presenter.BottomSheetPresenter;
+import com.mapl.weather_forecast.presenter.SearchActivityPresenter;
 import com.mapl.weather_forecast.view.BottomSheetView;
+import com.mapl.weather_forecast.view.SearchActivityView;
 import com.yayandroid.locationmanager.LocationManager;
 import com.yayandroid.locationmanager.configuration.GooglePlayServicesConfiguration;
 import com.yayandroid.locationmanager.configuration.LocationConfiguration;
 import com.yayandroid.locationmanager.configuration.PermissionConfiguration;
 import com.yayandroid.locationmanager.listener.LocationListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import moxy.MvpAppCompatActivity;
 import moxy.presenter.InjectPresenter;
 
 
 public class SearchActivity extends MvpAppCompatActivity
-        implements BottomSheetView, OnMapReadyCallback, View.OnClickListener, LocationListener, Postman {
+        implements BottomSheetView, SearchActivityView,
+        OnMapReadyCallback, View.OnClickListener,
+        LocationListener, Postman {
 
     @InjectPresenter
     BottomSheetPresenter bottomSheetPresenter;
 
-    private ArrayList<CityDataClassSearchPage> arrayList;
+    @InjectPresenter
+    SearchActivityPresenter searchActivityPresenter;
+
     private RecyclerView recyclerView;
-    private DataLoader dataLoader;
 
     final static String LOCATION_KEY = "LOCATION_KEY";
     final static String LAT_KEY = "LAT_KEY";
@@ -69,32 +70,28 @@ public class SearchActivity extends MvpAppCompatActivity
     private GoogleMap googleMap;
     private View dialog;
     private TextInputEditText inputEditText;
+    private MaterialCardView topBar;
     private FloatingActionButton fabDone, fabLocation;
     private BottomSheetBehavior bottomSheet;
     private SearchView searchView;
     private ImageView location, pointer;
-
-    private boolean notRunBefore = true;
 
     @SuppressLint("InflateParams")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        setSupportActionBar(findViewById(R.id.toolbar));
 
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.recyclerViewCityList);
-        mapView = findViewById(R.id.bigMapView);
 
         dialog = LayoutInflater.from(SearchActivity.this).inflate(R.layout.textinputlayout_item, null);
         inputEditText = dialog.findViewById(R.id.textInputEditText);
 
-        MaterialCardView topBar = findViewById(R.id.topBar);
+        topBar = findViewById(R.id.topBar);
         fabLocation = findViewById(R.id.fabLocation);
         fabDone = findViewById(R.id.fabDone);
-        mapView = findViewById(R.id.bigMapView);
+        mapView = findViewById(R.id.mapView);
         location = findViewById(R.id.locationImage);
         pointer = findViewById(R.id.pointerImageView);
         bottomSheet = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
@@ -107,113 +104,39 @@ public class SearchActivity extends MvpAppCompatActivity
         fabDone.setOnClickListener(this);
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_search, menu);
         MenuItem menuItem = menu.findItem(R.id.action_search);
-        MenuItem microItem = menu.findItem(R.id.action_micro);
         searchView = (SearchView) menuItem.getActionView();
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+        Observable.create(observable)
+                .debounce(250, TimeUnit.MILLISECONDS)
+                .distinct()
+                .subscribe(text -> searchActivityPresenter.textChanged((String) text));
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-
-                if (dataLoader != null)
-                    dataLoader.cancel(false);
-                dataLoader = new DataLoader();
-                dataLoader.execute(newText);
-                return false;
-            }
-        });
-
-        microItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Toast.makeText(getApplicationContext(), "Скоро добавлю", Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
-
-    private ArrayList<CityDataClassSearchPage> cityList(JSONObject jsonObject) {
-        ArrayList<CityDataClassSearchPage> arrayList = new ArrayList<>();
-        try {
-            JSONArray jsonArray = jsonObject
-                    .getJSONObject("response")
-                    .getJSONObject("GeoObjectCollection")
-                    .getJSONArray("featureMember");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                arrayList.add(new CityDataClassSearchPage(
-                        jsonArray.getJSONObject(i)
-                                .getJSONObject("GeoObject")
-                                .getString("name"),
-                        jsonArray.getJSONObject(i)
-                                .getJSONObject("GeoObject")
-                                .getString("description"),
-                        jsonArray.getJSONObject(i)
-                                .getJSONObject("GeoObject")
-                                .getJSONObject("Point")
-                                .getString("pos")));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return arrayList;
-    }
-
-    @Override
-    public void getLocationInfo(String cityName, Double lat, Double lon) {
-        Intent intent = new Intent();
-        intent.putExtra(SearchActivity.LOCATION_KEY, cityName);
-        intent.putExtra(SearchActivity.LAT_KEY, lat);
-        intent.putExtra(SearchActivity.LON_KEY, lon);
-        setResult(RESULT_OK, intent);
-        finish();
-    }
-
-    @SuppressLint("StaticFieldLeak")
-    private class DataLoader extends AsyncTask<String, Integer, Void> {
-
+    ObservableOnSubscribe<Object> observable = new ObservableOnSubscribe<Object>() {
         @Override
-        protected Void doInBackground(String... strings) {
-            JSONObject jsonObject = CityDataLoader.getJSONData(strings[0]);
-            if (jsonObject != null)
-                arrayList = cityList(jsonObject);
-            else
-                arrayList = new ArrayList<>();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(SearchActivity.this);
-            RecyclerViewAdapterSearchPage recyclerViewAdapter = new RecyclerViewAdapterSearchPage(arrayList, SearchActivity.this);
-            recyclerView.setHasFixedSize(true);
-            recyclerView.setLayoutManager(linearLayoutManager);
-            recyclerView.setAdapter(recyclerViewAdapter);
-            recyclerView.setRecyclerListener(new RecyclerView.RecyclerListener() {
+        public void subscribe(ObservableEmitter<Object> emitter) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
-                public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+                public boolean onQueryTextSubmit(String query) {
+                    emitter.onNext(query);
+                    return false;
+                }
 
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    emitter.onNext(newText);
+                    return false;
                 }
             });
         }
-
-        @Override
-        protected void onCancelled() {
-            super.onCancelled();
-        }
-    }
-
+    };
 
     private BottomSheetBehavior.BottomSheetCallback bottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
         @Override
@@ -234,30 +157,10 @@ public class SearchActivity extends MvpAppCompatActivity
                 bottomSheetPresenter.topBarClick(bottomSheet.getState());
                 break;
             case R.id.fabLocation:
-                locationManager = new LocationManager.Builder(getApplicationContext())
-                        .activity(SearchActivity.this)
-                        .configuration(new LocationConfiguration.Builder()
-                                .keepTracking(true)
-                                .askForPermission(new PermissionConfiguration.Builder().build())
-                                .useGooglePlayServices(new GooglePlayServicesConfiguration.Builder().build())
-                                .build())
-                        .notify(SearchActivity.this)
-                        .build();
-                locationManager.get();
+                bottomSheetPresenter.fabLocationClick();
                 break;
             case R.id.fabDone:
-                new MaterialAlertDialogBuilder(SearchActivity.this)
-                        .setView(dialog)
-                        .setTitle("Введите название:")
-                        .setPositiveButton("Ok", (dialogOk, which) -> {
-                    /*((Postman) activity).getLocationInfo(
-                            String.valueOf(inputEditText.getText()),
-                            googleMap.getCameraPosition().target.latitude,
-                            googleMap.getCameraPosition().target.longitude
-                    );*/
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
+                bottomSheetPresenter.fabDoneClick();
                 break;
         }
     }
@@ -316,13 +219,36 @@ public class SearchActivity extends MvpAppCompatActivity
     }
 
     @Override
-    public void clearFocus() {
-        searchView.clearFocus();
+    public void setLocation() {
+        locationManager = new LocationManager.Builder(getApplicationContext())
+                .activity(SearchActivity.this)
+                .configuration(new LocationConfiguration.Builder()
+                        .keepTracking(true)
+                        .askForPermission(new PermissionConfiguration.Builder().build())
+                        .useGooglePlayServices(new GooglePlayServicesConfiguration.Builder().build())
+                        .build())
+                .notify(SearchActivity.this)
+                .build();
+        locationManager.get();
     }
 
     @Override
-    public void onBackPressed() {
-        bottomSheetPresenter.backPressed(bottomSheet.getState());
+    public void setDialog() {
+        new MaterialAlertDialogBuilder(SearchActivity.this)
+                .setView(dialog)
+                .setTitle("Введите название:")
+                .setPositiveButton("Ok", (dialogOk, which) -> getLocationInfo(
+                        String.valueOf(inputEditText.getText()),
+                        googleMap.getCameraPosition().target.latitude,
+                        googleMap.getCameraPosition().target.longitude
+                ))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void clearFocus() {
+        searchView.clearFocus();
     }
 
     @Override
@@ -364,5 +290,31 @@ public class SearchActivity extends MvpAppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         locationManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void setRecyclerView(ArrayList<CityDataClassSearchPage> arrayList) {
+        runOnUiThread(() -> {
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(SearchActivity.this, LinearLayoutManager.VERTICAL, false);
+            RecyclerViewAdapterSearchPage recyclerViewAdapter = new RecyclerViewAdapterSearchPage(arrayList, SearchActivity.this);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.setAdapter(recyclerViewAdapter);
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        bottomSheetPresenter.backPressed(bottomSheet.getState());
+    }
+
+    @Override
+    public void getLocationInfo(String cityName, Double lat, Double lon) {
+        Intent intent = new Intent();
+        intent.putExtra(SearchActivity.LOCATION_KEY, cityName);
+        intent.putExtra(SearchActivity.LAT_KEY, lat);
+        intent.putExtra(SearchActivity.LON_KEY, lon);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
